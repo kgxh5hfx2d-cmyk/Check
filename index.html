@@ -288,7 +288,10 @@ input[type=“checkbox”] { width: 20px; height: 20px; accent-color: var(–acc
 <!-- ══════════ EINSTELLUNGEN ══════════ -->
 
 <div id="tab-einst" class="section-visible container animate-in">
-  <div class="grid-2">
+
+  <!-- Zeile 1: Lohngruppe + Zuschläge -->
+
+  <div class="grid-2" style="margin-bottom:1.5rem;">
     <div>
       <div class="card">
         <div class="card-title"><div class="dot"></div>Lohngruppe (ETV Allg. 01.03.2024)</div>
@@ -336,10 +339,128 @@ input[type=“checkbox”] { width: 20px; height: 20px; accent-color: var(–acc
   </div>
   <div class="sep"></div>
   <div class="tip" style="margin-bottom:1rem;">Nachtzeit tariflich: 20:00–05:00 Uhr</div>
-  <button class="btn btn-primary" style="width:100%;" onclick="speichern()">💾 Einstellungen speichern</button>
 </div>
 ```
 
+  </div>
+
+  <!-- Zeile 2: Persönliche Daten + Netto-Vorschau -->
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="dot dot-purple"></div>Persönliche Daten &amp; Steuer</div>
+
+```
+  <div class="grid-2" style="gap:0.8rem;">
+    <div class="field"><label>Vorname</label><input type="text" id="vorname" placeholder="Max"></div>
+    <div class="field"><label>Nachname</label><input type="text" id="nachname" placeholder="Mustermann"></div>
+  </div>
+
+  <div class="sep"></div>
+  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.8rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;">Steuer</div>
+
+  <div class="grid-2" style="gap:0.8rem;">
+    <div class="field">
+      <label>Steuerklasse</label>
+      <select id="steuerklasse" onchange="berechneNettoVorschau()">
+        <option value="1">Klasse 1 — Ledig</option>
+        <option value="2">Klasse 2 — Alleinerziehend</option>
+        <option value="3">Klasse 3 — Verheiratet (höheres Eink.)</option>
+        <option value="4">Klasse 4 — Verheiratet (gleiches Eink.)</option>
+        <option value="5">Klasse 5 — Verheiratet (niedrigeres Eink.)</option>
+        <option value="6">Klasse 6 — Zweitjob</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Kinderfreibetrag (Anzahl Kinder)</label>
+      <input type="number" id="kinder" value="0" min="0" step="0.5" onchange="berechneNettoVorschau()" placeholder="0">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Bundesland (für Kirchensteuer & PV)</label>
+    <select id="bundesland" onchange="berechneNettoVorschau()">
+      <option value="BW">Baden-Württemberg</option>
+      <option value="BY">Bayern</option>
+      <option value="BE">Berlin</option>
+      <option value="BB">Brandenburg</option>
+      <option value="HB">Bremen</option>
+      <option value="HH">Hamburg</option>
+      <option value="HE">Hessen</option>
+      <option value="MV">Mecklenburg-Vorpommern</option>
+      <option value="NI">Niedersachsen</option>
+      <option value="NW" selected>Nordrhein-Westfalen</option>
+      <option value="RP">Rheinland-Pfalz</option>
+      <option value="SL">Saarland</option>
+      <option value="SN">Sachsen</option>
+      <option value="ST">Sachsen-Anhalt</option>
+      <option value="SH">Schleswig-Holstein</option>
+      <option value="TH">Thüringen</option>
+    </select>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
+    <input type="checkbox" id="kirchensteuer" onchange="berechneNettoVorschau()">
+    <label style="margin-bottom:0;cursor:pointer;font-size:0.8rem;text-transform:none;letter-spacing:0;" for="kirchensteuer">
+      ✝️ Kirchensteuerpflichtig (8–9% der Lohnsteuer)
+    </label>
+  </div>
+
+  <div class="sep"></div>
+  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.8rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;">Kranken- &amp; Pflegeversicherung</div>
+
+  <div class="field">
+    <label>Krankenversicherung</label>
+    <select id="kvTyp" onchange="berechneNettoVorschau()">
+      <option value="gesetzlich">Gesetzlich (GKV)</option>
+      <option value="privat">Privat (PKV) — nur AN-Anteil relevant</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>GKV Zusatzbeitrag deiner Kasse (%)</label>
+    <input type="number" id="kvZusatz" value="1.7" step="0.1" min="0" max="5" onchange="berechneNettoVorschau()" placeholder="z.B. 1.7">
+  </div>
+  <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
+    <input type="checkbox" id="pvKinder" onchange="berechneNettoVorschau()">
+    <label style="margin-bottom:0;cursor:pointer;font-size:0.8rem;text-transform:none;letter-spacing:0;" for="pvKinder">
+      👶 Kinder vorhanden (kein PV-Zuschlag)
+    </label>
+  </div>
+
+  <div class="tip">
+    💡 Alle Abgaben basieren auf den gesetzlichen Sätzen 2025. Die Netto-Schätzung ist ein Näherungswert — für exakte Zahlen gilt deine Lohnabrechnung.
+  </div>
+</div>
+
+<!-- Netto-Vorschau Card -->
+<div>
+  <div class="card" id="netto-vorschau-card">
+    <div class="card-title"><div class="dot dot-green"></div>Netto-Schätzung (monatlich)</div>
+    <div id="netto-vorschau-inhalt">
+      <div style="text-align:center;padding:2rem;color:var(--muted);">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">🧮</div>
+        Einstellungen speichern für Berechnung.
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.2rem;">
+    <div class="card-title"><div class="dot dot-blue"></div>Abgaben-Info 2025</div>
+    <div class="row"><span class="row-label">Rentenversicherung AN</span><span>9,3%</span></div>
+    <div class="row"><span class="row-label">Arbeitslosenversicherung AN</span><span>1,3%</span></div>
+    <div class="row"><span class="row-label">GKV Basisbeitrag AN</span><span>7,3%</span></div>
+    <div class="row"><span class="row-label">GKV Zusatzbeitrag AN (½)</span><span>variabel</span></div>
+    <div class="row"><span class="row-label">Pflegeversicherung AN (ohne Kinder)</span><span>2,4%</span></div>
+    <div class="row"><span class="row-label">Pflegeversicherung AN (mit Kindern)</span><span>1,7%</span></div>
+    <div class="row" style="border:none;"><span class="row-label">Kirchensteuer (NRW/BY etc.)</span><span>8–9% d. LSt</span></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <div style="margin-top:1.5rem;">
+    <button class="btn btn-primary" style="width:100%;padding:1rem;" onclick="speichern()">💾 Alle Einstellungen speichern</button>
   </div>
 </div>
 
@@ -529,7 +650,10 @@ let einst = JSON.parse(localStorage.getItem('dmk_einst') || 'null') || {
   stundenLohn:18.66, lohngruppe:'2',
   fruehVon:'06:00',fruehBis:'13:00',spaetVon:'13:00',spaetBis:'20:00',nachtVon:'20:00',nachtBis:'06:00',
   pauseMin:30,
-  z_nacht:50,z_mehr:25,z_so:50,z_sa1:15,z_sa2:50,z_ft_woche:175,z_ft_so:75,mehr_ab:40
+  z_nacht:50,z_mehr:25,z_so:50,z_sa1:15,z_sa2:50,z_ft_woche:175,z_ft_so:75,mehr_ab:40,
+  // Persönliche Daten
+  vorname:'', nachname:'', steuerklasse:1, kinder:0, kirchensteuer:false,
+  kvTyp:'gesetzlich', kvZusatz:1.7, pvKinder:false, bundesland:'NW'
 };
 let schichten = JSON.parse(localStorage.getItem('dmk_schichten') || '[]');
 
@@ -544,8 +668,12 @@ function init() {
   ).join('');
 
   const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
-    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab'];
+    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab',
+    'vorname','nachname','steuerklasse','kinder','kvZusatz','kvTyp','bundesland'];
   felder.forEach(id => { const el=document.getElementById(id); if(el) el.value=einst[id]; });
+  if(document.getElementById('kirchensteuer')) document.getElementById('kirchensteuer').checked=einst.kirchensteuer;
+  if(document.getElementById('pvKinder')) document.getElementById('pvKinder').checked=einst.pvKinder;
+  berechneNettoVorschau();
 
   const today = new Date().toISOString().split('T')[0];
   if(document.getElementById('sDatum')) document.getElementById('sDatum').value = today;
@@ -571,11 +699,18 @@ function waehleLG(gr, std) {
 
 function speichern() {
   const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
-    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab'];
+    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab',
+    'vorname','nachname','steuerklasse','kinder','kvZusatz','kvTyp','bundesland'];
   felder.forEach(id => {
     const el=document.getElementById(id); if(!el) return;
-    einst[id] = (el.type==='text'||el.type==='time') ? el.value : parseFloat(el.value)||0;
+    if(el.type==='checkbox') einst[id]=el.checked;
+    else if(el.type==='text'||el.type==='time'||el.tagName==='SELECT') einst[id]=el.value;
+    else einst[id]=parseFloat(el.value)||0;
   });
+  einst.kirchensteuer = document.getElementById('kirchensteuer')?.checked||false;
+  einst.pvKinder      = document.getElementById('pvKinder')?.checked||false;
+  einst.steuerklasse  = parseInt(document.getElementById('steuerklasse')?.value||1);
+  einst.kinder        = parseFloat(document.getElementById('kinder')?.value||0);
   localStorage.setItem('dmk_einst', JSON.stringify(einst));
   schichten = schichten.map(s => ({...s, ...berechne(s.datum,s.von,s.bis,s.pause,s.feiertag)}));
   localStorage.setItem('dmk_schichten', JSON.stringify(schichten));
@@ -925,6 +1060,186 @@ function showTab(id,btn){
   if(id==='auswertung'||id==='check') updateAuswertung();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// ── NETTO-SCHÄTZUNG 2025 ───────────────────────────────────────────
+function berechneNetto(bruttoMonat) {
+  const sk = parseInt(einst.steuerklasse) || 1;
+  const kinder = parseFloat(einst.kinder) || 0;
+  const kirchensteuer = einst.kirchensteuer || false;
+  const bl = einst.bundesland || 'NW';
+  const pvKinder = einst.pvKinder || false;
+  const kvZusatz = parseFloat(einst.kvZusatz) || 1.7;
+
+  // ── Sozialversicherung ──────────────────────────────────────────
+  // Beitragsbemessungsgrenzen 2025
+  const bbgRV = 8050;   // monatlich West
+  const bbgKV = 5512.5; // monatlich
+
+  const rvBasis = Math.min(bruttoMonat, bbgRV);
+  const kvBasis = Math.min(bruttoMonat, bbgKV);
+
+  const rv   = rvBasis * 0.093;                        // Rentenvers. AN 9,3%
+  const alv  = rvBasis * 0.013;                        // Arbeitslosen AN 1,3%
+  const kv   = kvBasis * (0.073 + kvZusatz/2/100);     // GKV AN: 7,3% + ½ Zusatz
+  const pv   = kvBasis * (pvKinder ? 0.017 : 0.024);  // PV: 1,7% m. Kindern / 2,4% ohne
+
+  const svGesamt = rv + alv + kv + pv;
+
+  // ── Lohnsteuer (vereinfacht nach Grundtabelle 2025) ─────────────
+  // Jahresbrutto abzügl. SV-Pauschale (Arbeitnehmer-Pauschbetrag 1.230€/Jahr)
+  const jahrBrutto = bruttoMonat * 12;
+  const svJahr = svGesamt * 12;
+
+  // Kinderfreibetrag: 6.612€ je Kind (2025), aber nur bei SK 1,2,3,4
+  const kfb = (sk <= 4) ? kinder * 6612 : 0;
+
+  // Werbungskosten-Pauschbetrag
+  const wkPausch = 1230;
+
+  // zu versteuerndes Einkommen (zvE)
+  let zve = Math.max(0, jahrBrutto - svJahr - wkPausch - kfb);
+
+  // Grundfreibetrag 2025: 12.096€
+  const grundfb = 12096;
+
+  // Steuerklassen-Faktoren (vereinfacht):
+  // SK1: Grundtabelle
+  // SK2: Grundtabelle + Entlastungsbetrag 4.260€
+  // SK3: Splittingtabelle (zvE halbiert × 2)
+  // SK4: Grundtabelle
+  // SK5: kein Grundfreibetrag, hoher Prozentsatz
+  // SK6: ab 1. Euro besteuert, kein Grundfreibetrag
+  let lstJahr = 0;
+
+  if (sk === 5) {
+    // SK5: Mindest-Lohnsteuer ~ SK1 ohne Freibetrag, dann ×2 (Schätzung)
+    zve = Math.max(0, jahrBrutto - svJahr - wkPausch);
+    lstJahr = calcGrundsteuer(zve) * 1.25;
+  } else if (sk === 6) {
+    zve = Math.max(0, jahrBrutto - svJahr - wkPausch);
+    lstJahr = calcGrundsteuer(zve) * 1.4;
+  } else if (sk === 3) {
+    // Splitting: zvE halbieren, steuer × 2
+    const zveSplit = Math.max(0, (jahrBrutto*2 - svJahr - wkPausch - kfb) / 2);
+    lstJahr = calcGrundsteuer(zveSplit) * 2;
+  } else if (sk === 2) {
+    zve = Math.max(0, jahrBrutto - svJahr - wkPausch - kfb - 4260);
+    lstJahr = calcGrundsteuer(zve);
+  } else {
+    // SK1, SK4
+    lstJahr = calcGrundsteuer(zve);
+  }
+
+  const lstMonat = lstJahr / 12;
+
+  // Solidaritätszuschlag (entfällt für ~90% der Stpfl. seit 2021)
+  // Freigrenze: 18.130€ LSt/Jahr → erst darüber, daher meist 0
+  const soliGrenze = 18130 / 12;
+  const soli = lstMonat > soliGrenze ? lstMonat * 0.055 : 0;
+
+  // Kirchensteuer: 9% NRW/BE/BB/HB/HH/MV/NI/RP/SL/ST/SH/TH | 8% BW/BY/HE/SN
+  const ksatz = ['BW','BY','HE','SN'].includes(bl) ? 0.08 : 0.09;
+  const ks = kirchensteuer ? lstMonat * ksatz : 0;
+
+  const steuerGesamt = lstMonat + soli + ks;
+  const abzuegeGesamt = svGesamt + steuerGesamt;
+  const netto = bruttoMonat - abzuegeGesamt;
+
+  return {
+    brutto: bruttoMonat,
+    rv, alv, kv, pv, svGesamt,
+    lstMonat, soli, ks, steuerGesamt,
+    abzuegeGesamt, netto,
+    effRate: bruttoMonat > 0 ? (abzuegeGesamt/bruttoMonat*100) : 0
+  };
+}
+
+// Grundtabelle-Berechnung 2025 (vereinfachte Formel nach §32a EStG)
+function calcGrundsteuer(zve) {
+  if (zve <= 12096) return 0;
+  if (zve <= 17005) {
+    const y = (zve - 12096) / 10000;
+    return (922.98 * y + 1400) * y;
+  }
+  if (zve <= 66760) {
+    const z = (zve - 17005) / 10000;
+    return (181.19 * z + 2397) * z + 1025.38;
+  }
+  if (zve <= 277825) {
+    return 0.42 * zve - 10602.13;
+  }
+  return 0.45 * zve - 18936.88;
+}
+
+function berechneNettoVorschau() {
+  // Lese aktuelle Werte direkt aus Formular (live, vor Speichern)
+  const sl = parseFloat(document.getElementById('stundenLohn')?.value) || einst.stundenLohn;
+  const bruttoMonat = sl * 40 * 52 / 12; // Schätzung: 40h/Woche Jahresschnitt
+
+  // Temporäre einst-Werte für Berechnung
+  const tmpEinst = {
+    ...einst,
+    steuerklasse: parseInt(document.getElementById('steuerklasse')?.value) || einst.steuerklasse,
+    kinder: parseFloat(document.getElementById('kinder')?.value) || einst.kinder,
+    kirchensteuer: document.getElementById('kirchensteuer')?.checked ?? einst.kirchensteuer,
+    bundesland: document.getElementById('bundesland')?.value || einst.bundesland,
+    pvKinder: document.getElementById('pvKinder')?.checked ?? einst.pvKinder,
+    kvZusatz: parseFloat(document.getElementById('kvZusatz')?.value) || einst.kvZusatz,
+    kvTyp: document.getElementById('kvTyp')?.value || einst.kvTyp,
+  };
+
+  const savedEinst = einst;
+  einst = tmpEinst; // temporarily swap for berechneNetto
+  const r = berechneNetto(bruttoMonat);
+  einst = savedEinst;
+
+  const div = document.getElementById('netto-vorschau-inhalt');
+  if (!div) return;
+
+  const vorname = document.getElementById('vorname')?.value || '';
+  const nachname = document.getElementById('nachname')?.value || '';
+  const name = (vorname || nachname) ? `${vorname} ${nachname}`.trim() : null;
+
+  const sk = tmpEinst.steuerklasse;
+  const skNamen = {1:'Ledig',2:'Alleinerziehend',3:'Verheiratet (hoch)',4:'Verheiratet (gleich)',5:'Verheiratet (niedrig)',6:'Zweitjob'};
+
+  div.innerHTML = `
+    ${name ? `<div style="font-size:0.72rem;color:var(--muted);margin-bottom:1rem;">👤 ${name}</div>` : ''}
+
+    <div style="background:var(--surface2);border-radius:10px;padding:1rem;margin-bottom:1rem;text-align:center;">
+      <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Geschätztes Netto/Monat</div>
+      <div style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:700;color:var(--green);line-height:1;">${fmt(r.netto)}</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.4rem;">bei ${fmt(r.brutto)} Brutto · StKl. ${sk} (${skNamen[sk]})</div>
+    </div>
+
+    <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Abzüge im Detail</div>
+
+    <div class="row"><span class="row-label">🏦 Rentenversicherung (9,3%)</span><span class="red">− ${fmt(r.rv)}</span></div>
+    <div class="row"><span class="row-label">💼 Arbeitslosenvers. (1,3%)</span><span class="red">− ${fmt(r.alv)}</span></div>
+    <div class="row"><span class="row-label">🏥 Krankenversicherung</span><span class="red">− ${fmt(r.kv)}</span></div>
+    <div class="row"><span class="row-label">🧓 Pflegeversicherung</span><span class="red">− ${fmt(r.pv)}</span></div>
+    <div class="row" style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.1rem;">
+      <span>Sozialabgaben gesamt</span><span class="red" style="font-weight:500;">− ${fmt(r.svGesamt)}</span>
+    </div>
+
+    <div class="sep" style="margin:0.8rem 0;"></div>
+
+    <div class="row"><span class="row-label">📋 Lohnsteuer (StKl. ${sk})</span><span class="orange">− ${fmt(r.lstMonat)}</span></div>
+    ${r.soli > 0 ? `<div class="row"><span class="row-label">🔹 Solidaritätszuschlag</span><span class="orange">− ${fmt(r.soli)}</span></div>` : '<div class="row"><span class="row-label">🔹 Solidaritätszuschlag</span><span class="green">entfällt ✓</span></div>'}
+    ${tmpEinst.kirchensteuer ? `<div class="row"><span class="row-label">✝️ Kirchensteuer</span><span class="orange">− ${fmt(r.ks)}</span></div>` : ''}
+    <div class="row" style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.1rem;">
+      <span>Steuern gesamt</span><span class="orange" style="font-weight:500;">− ${fmt(r.steuerGesamt)}</span>
+    </div>
+
+    <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;padding:0.8rem 1rem;margin-top:0.8rem;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.8rem;">Effektive Abgabenquote</span>
+      <span style="color:var(--accent);font-weight:600;">${r.effRate.toFixed(1)}%</span>
+    </div>
+
+    <div class="tip" style="margin-top:0.8rem;">⚠️ Näherungswert. Steuerfreie Zuschläge (Nacht, So, FT) reduzieren die tatsächliche Steuer — dein echtes Netto kann höher sein!</div>
+  `;
+}
+
 
 init();
 </script>
