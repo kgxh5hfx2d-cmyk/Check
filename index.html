@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LohnCheck — DMK Edewecht</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0e12;
+  --surface: #13161d;
+  --surface2: #1a1e28;
+  --surface3: #21263a;
+  --border: #252b3b;
+  --accent: #f0c040;
+  --accent2: #ff6b4a;
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --text: #e8eaf0;
+  --muted: #5a6180;
+  --danger: #f87171;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 0%, rgba(240,192,64,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(96,165,250,0.05) 0%, transparent 60%);
+}
+header {
+  padding: 1.4rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { display: flex; align-items: center; gap: 1rem; }
+.logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--accent), #e0a820);
+  border-radius: 10px;
+  display: grid; place-items: center; font-size: 1.2rem;
+  box-shadow: 0 0 20px rgba(240,192,64,0.3);
+}
+h1 { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+h1 span { color: var(--accent); }
+.header-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.header-badge { font-size: 0.7rem; padding: 0.3rem 0.8rem; background: rgba(240,192,64,0.1); color: var(--accent); border: 1px solid rgba(240,192,64,0.3); border-radius: 20px; }
+nav { display: flex; border-bottom: 1px solid var(--border); padding: 0 2.5rem; overflow-x: auto; }
+.tab { padding: 0.8rem 1.4rem; cursor: pointer; font-size: 0.75rem; color: var(--muted); border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; font-family: 'DM Mono', monospace; transition: all 0.15s; white-space: nowrap; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.container { max-width: 1280px; margin: 0 auto; padding: 2rem 2.5rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
+.card-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.dot-blue { background: var(--blue); }
+.dot-green { background: var(--green); }
+.dot-purple { background: var(--purple); }
+label { display: block; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.06em; }
+input, select { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.6rem 0.85rem; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 0.83rem; transition: border-color 0.15s; outline: none; margin-bottom: 0; }
+input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(240,192,64,0.1); }
+input[type="checkbox"] { width: auto; cursor: pointer; }
+.field { margin-bottom: 1rem; }
+.field:last-child { margin-bottom: 0; }
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.3rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: #0c0e12; }
+.btn-primary:hover { background: #f5cc55; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(240,192,64,0.3); }
+.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.72rem; }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid rgba(248,113,113,0.4); }
+.btn-danger:hover { background: rgba(248,113,113,0.1); }
+.btn-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; position: relative; overflow: hidden; }
+.stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--stat-color, var(--accent)); }
+.stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.stat-value { font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 700; color: var(--stat-color, var(--accent)); line-height: 1; }
+.stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.4rem; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+th { text-align: left; padding: 0.6rem 0.9rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 0.75rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.035); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.tr-total td { border-top: 1px solid var(--border); font-weight: 500; color: var(--accent); }
+.badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.18rem 0.5rem; border-radius: 4px; font-size: 0.67rem; font-weight: 500; }
+.badge-night { background: rgba(96,165,250,0.12); color: var(--blue); }
+.badge-late  { background: rgba(167,139,250,0.12); color: var(--purple); }
+.badge-early { background: rgba(240,192,64,0.12); color: var(--accent); }
+.badge-sun   { background: rgba(255,107,74,0.12); color: var(--accent2); }
+.badge-hol   { background: rgba(248,113,113,0.12); color: var(--danger); }
+.badge-sat   { background: rgba(74,222,128,0.12); color: var(--green); }
+.badge-free  { background: rgba(90,97,128,0.12); color: var(--muted); }
+.alert { padding: 0.9rem 1rem; border-radius: 8px; font-size: 0.78rem; margin-bottom: 0.8rem; line-height: 1.5; }
+.alert-ok   { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); color: var(--green); }
+.alert-warn { background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.3); color: var(--accent); }
+.alert-err  { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+.alert-info { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.3); color: var(--blue); }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; }
+.row:last-child { border-bottom: none; }
+.row-label { color: var(--muted); }
+.row-val { font-weight: 500; }
+.green  { color: var(--green); }
+.blue   { color: var(--blue); }
+.accent { color: var(--accent); }
+.orange { color: var(--accent2); }
+.red    { color: var(--danger); }
+.purple { color: var(--purple); }
+.progress { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin: 0.3rem 0 0.8rem; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.section-hidden  { display: none; }
+.section-visible { display: block; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeSlide 0.25s ease forwards; }
+.sep { height: 1px; background: var(--border); margin: 1.2rem 0; }
+.lohn-group-select { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+.lg-btn { padding: 0.5rem 0.3rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.72rem; transition: all 0.15s; }
+.lg-btn:hover, .lg-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,0.08); }
+.lg-btn .lg-num { font-size: 1rem; font-weight: 700; display: block; color: var(--text); }
+.lg-btn.active .lg-num { color: var(--accent); }
+.lg-btn .lg-lohn { font-size: 0.6rem; color: var(--muted); display: block; }
+.lg-btn.active .lg-lohn { color: var(--accent); }
+.tip { font-size: 0.72rem; color: var(--muted); background: var(--surface2); border-left: 2px solid var(--accent); padding: 0.5rem 0.8rem; border-radius: 0 6px 6px 0; margin-top: 0.6rem; line-height: 1.5; }
+.rotation-block { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 0.8rem; }
+.rotation-header { padding: 0.6rem 1rem; background: var(--surface2); font-size: 0.72rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+.rotation-days { display: flex; }
+.rot-day { flex: 1; padding: 0.6rem 0.2rem; text-align: center; font-size: 0.68rem; border-right: 1px solid var(--border); }
+.rot-day:last-child { border-right: none; }
+.rot-day .d { color: var(--muted); font-size: 0.6rem; margin-bottom: 2px; }
+/* ── MOBILE BOTTOM NAV ── */
+.bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+  z-index: 100;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+}
+.bottom-nav-inner { display: flex; justify-content: space-around; }
+.bnav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 0.4rem 0.6rem; background: none; border: none; cursor: pointer;
+  font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--muted);
+  border-radius: 10px; transition: all 0.15s; min-width: 56px;
+}
+.bnav-btn .bnav-icon { font-size: 1.3rem; line-height: 1; }
+.bnav-btn.active { color: var(--accent); }
+.bnav-btn.active .bnav-icon { filter: drop-shadow(0 0 4px rgba(240,192,64,0.5)); }
+
+@media (max-width: 768px) {
+/* Layout */
+.container { padding: 0.9rem 0.9rem 5.5rem; }
+nav { display: none; }
+header { padding: 0.9rem 1rem; }
+.header-badge { display: none; }
+.bottom-nav { display: block; }
+h1 { font-size: 1.25rem; }
+
+/* Grids → single column */
+.grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 1rem; }
+
+/* Stat grid: 2×2 on mobile */
+#stat-row { grid-template-columns: 1fr 1fr !important; gap: 0.8rem; }
+.stat-value { font-size: 1.3rem; }
+
+/* Cards */
+.card { padding: 1.1rem; border-radius: 12px; }
+.card-title { font-size: 0.92rem; margin-bottom: 1rem; }
+
+/* Inputs — larger touch targets */
+input, select {
+padding: 0.75rem 0.9rem;
+font-size: 1rem; /* prevents iOS zoom */
+border-radius: 10px;
+}
+label { font-size: 0.7rem; margin-bottom: 0.4rem; }
+.field { margin-bottom: 1.1rem; }
+
+/* Buttons — full width & bigger tap area */
+.btn { padding: 0.8rem 1.2rem; font-size: 0.82rem; border-radius: 10px; }
+.btn-group { flex-direction: column; }
+.btn-group .btn { width: 100%; justify-content: center; }
+.btn-sm { padding: 0.5rem 0.8rem; }
+
+/* Lohngruppen — 4 columns on mobile */
+.lohn-group-select { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.lg-btn .lg-num { font-size: 0.9rem; }
+.lg-btn .lg-lohn { font-size: 0.55rem; }
+
+/* Rotation calendar — smaller text */
+.rot-day { padding: 0.4rem 0.1rem; }
+.rotation-header { font-size: 0.68rem; padding: 0.5rem 0.7rem; flex-direction: column; gap: 2px; }
+
+/* Schicht list items — stack vertically */
+.schicht-mobile { flex-direction: column !important; align-items: flex-start !important; gap: 0.4rem !important; }
+.schicht-mobile .sm-row1 { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
+.schicht-mobile .sm-row2 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+/* Vorschau card spacing */
+#vorschau .card { padding: 0.9rem; }
+
+/* Alert font size */
+.alert { font-size: 0.8rem; }
+
+/* Table — horizontal scroll with hint */
+.table-wrap { -webkit-overflow-scrolling: touch; }
+.table-wrap::after {
+content: ‘← scrollbar →’;
+display: block; text-align: center;
+font-size: 0.62rem; color: var(–muted); padding: 0.4rem;
+}
+table { font-size: 0.72rem; }
+th, td { padding: 0.5rem 0.6rem; }
+
+/* Row items bigger */
+.row { padding: 0.75rem 0; font-size: 0.82rem; }
+.tip { font-size: 0.74rem; }
+
+/* Checkbox bigger on mobile */
+input[type=“checkbox”] { width: 20px; height: 20px; accent-color: var(–accent); }
+.field:has(#sFeiertag) { display: flex; align-items: center; gap: 0.7rem; }
+.field:has(#sFeiertag) label { margin-bottom: 0; font-size: 0.82rem; text-transform: none; letter-spacing: 0; }
+
+/* Rotation days font smaller */
+.rot-day { font-size: 0.6rem; }
+.rotation-days { overflow-x: auto; }
+
+/* Lohncheck ergebnis card */
+#check-ergebnis .card { margin-top: 0; }
+
+/* Smooth scrolling hint for schicht list */
+#schicht-liste > div { padding-bottom: 0.5rem; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚙</div>
+    <div>
+      <h1>Lohn<span>Check</span></h1>
+      <div class="header-sub">DMK Edewecht · ETV Allg. · Stand 05/2024</div>
+    </div>
+  </div>
+  <div class="header-badge">365 Tage Schichtbetrieb</div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showTab('einst',this)">⚙ Einstellungen</button>
+  <button class="tab" onclick="showTab('rotation',this)">🔄 Schichtrotation</button>
+  <button class="tab" onclick="showTab('schichten',this)">📅 Schichten</button>
+  <button class="tab" onclick="showTab('auswertung',this)">📊 Auswertung</button>
+  <button class="tab" onclick="showTab('check',this)">🔍 Lohncheck</button>
+</nav>
+
+<!-- ══════════ BOTTOM NAV (mobile) ══════════ -->
+
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" onclick="showTab('einst',this)">
+      <span class="bnav-icon">⚙️</span><span>Einst.</span>
+    </button>
+    <button class="bnav-btn" onclick="showTab('rotation',this)">
+      <span class="bnav-icon">🔄</span><span>Rotation</span>
+    </button>
+    <button class="bnav-btn" onclick="showTab('schichten',this)">
+      <span class="bnav-icon">📅</span><span>Schichten</span>
+    </button>
+    <button class="bnav-btn" onclick="showTab('auswertung',this)">
+      <span class="bnav-icon">📊</span><span>Auswert.</span>
+    </button>
+    <button class="bnav-btn" onclick="showTab('check',this)">
+      <span class="bnav-icon">🔍</span><span>Check</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ EINSTELLUNGEN ══════════ -->
+
+<div id="tab-einst" class="section-visible container animate-in">
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Lohngruppe (ETV Allg. 01.03.2024)</div>
+        <div class="lohn-group-select" id="lg-buttons"></div>
+        <div class="field">
+          <label>Stundenlohn (€/h)</label>
+          <input type="number" id="stundenLohn" step="0.01">
+        </div>
+        <div class="field">
+          <label>Gewählte Lohngruppe</label>
+          <input type="text" id="lohngruppe" readonly style="opacity:0.6;">
+        </div>
+        <div class="tip">💡 Werte gemäß Tarifvertrag DMK Edewecht, 40h/Woche Basis.</div>
+      </div>
+
+```
+  <div class="card" style="margin-top:1.2rem;">
+    <div class="card-title"><div class="dot dot-blue"></div>Schichtzeiten</div>
+    <div class="grid-2" style="gap:0.8rem;">
+      <div class="field"><label>Frühschicht von</label><input type="time" id="fruehVon" value="06:00"></div>
+      <div class="field"><label>Frühschicht bis</label><input type="time" id="fruehBis" value="13:00"></div>
+      <div class="field"><label>Spätschicht von</label><input type="time" id="spaetVon" value="13:00"></div>
+      <div class="field"><label>Spätschicht bis</label><input type="time" id="spaetBis" value="20:00"></div>
+      <div class="field"><label>Nachtschicht von</label><input type="time" id="nachtVon" value="20:00"></div>
+      <div class="field"><label>Nachtschicht bis</label><input type="time" id="nachtBis" value="06:00"></div>
+    </div>
+    <div class="field"><label>Pause (Minuten)</label><input type="number" id="pauseMin" value="30"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><div class="dot dot-green"></div>Zuschlagssätze laut Tarifvertrag</div>
+  <div class="alert alert-info" style="margin-bottom:1rem; font-size:0.75rem;">
+    📄 Direkt aus dem ETV-Dokument (Stand 05/2024) übernommen. Nur bei abweichendem TV anpassen.
+  </div>
+  <div class="grid-2" style="gap:0.8rem;">
+    <div class="field"><label>🌙 Nacht 20–05h (%)</label><input type="number" id="z_nacht" value="50"></div>
+    <div class="field"><label>⏱ Mehrarbeit (%)</label><input type="number" id="z_mehr" value="25"></div>
+    <div class="field"><label>☀️ Sonntag (%)</label><input type="number" id="z_so" value="50"></div>
+    <div class="field"><label>🟡 Samstag bis 13h (%)</label><input type="number" id="z_sa1" value="15"></div>
+    <div class="field"><label>🟠 Samstag ab 13h (%)</label><input type="number" id="z_sa2" value="50"></div>
+    <div class="field"><label>🔴 Feiertag Mo–Sa (%)</label><input type="number" id="z_ft_woche" value="175"></div>
+    <div class="field"><label>🔴 Feiertag Sonntag (%)</label><input type="number" id="z_ft_so" value="75"></div>
+    <div class="field"><label>Mehrarbeit ab (h/Woche)</label><input type="number" id="mehr_ab" value="40"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="tip" style="margin-bottom:1rem;">Nachtzeit tariflich: 20:00–05:00 Uhr</div>
+  <button class="btn btn-primary" style="width:100%;" onclick="speichern()">💾 Einstellungen speichern</button>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ══════════ ROTATION ══════════ -->
+
+<div id="tab-rotation" class="section-hidden container">
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Rotationsstart</div>
+        <div class="field">
+          <label>Montag der Woche 1 (Rotationsstart)</label>
+          <input type="date" id="rotStart" onchange="renderRotation()">
+        </div>
+        <div class="tip">💡 Gib den Montag ein, an dem deine Rotation in Woche 1 beginnt. Die App berechnet automatisch alle 5 Wochen.</div>
+        <div class="sep"></div>
+        <div class="card-title" style="margin-bottom:0.6rem;"><div class="dot dot-blue"></div>Legende</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;font-size:0.72rem;">
+          <span class="badge badge-early">🌅 Frühschicht 06–13h</span>
+          <span class="badge badge-late">🌆 Spätschicht 13–20h</span>
+          <span class="badge badge-night">🌙 Nachtschicht 20–06h</span>
+          <span class="badge badge-free">🛌 Frei / ZBV</span>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;" onclick="importiereRotation()">
+          📥 Alle Schichten automatisch eintragen
+        </button>
+        <div class="tip" style="margin-top:0.6rem;">Trägt alle Arbeitsschichten der 5-Wochen-Rotation automatisch ein. Feiertage danach bitte manuell markieren.</div>
+      </div>
+
+```
+  <div class="card" style="margin-top:1.2rem;">
+    <div class="card-title"><div class="dot dot-purple"></div>Dein Schichtmodell (fix)</div>
+    <div id="rotation-schema"></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title"><div class="dot dot-green"></div>Nächste 5 Wochen im Detail</div>
+  <div id="rotation-kalender"></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ══════════ SCHICHTEN ══════════ -->
+
+<div id="tab-schichten" class="section-hidden container">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Schicht erfassen</div>
+      <div class="grid-2" style="gap:0.8rem;">
+        <div class="field"><label>Datum</label><input type="date" id="sDatum"></div>
+        <div class="field">
+          <label>Schichtart</label>
+          <select id="sArt" onchange="schichtArtWaehlen()">
+            <option value="frueh">🌅 Frühschicht (06–13h)</option>
+            <option value="spaet">🌆 Spätschicht (13–20h)</option>
+            <option value="nacht">🌙 Nachtschicht (20–06h)</option>
+            <option value="custom">✏️ Eigene Zeiten</option>
+          </select>
+        </div>
+        <div class="field"><label>Von</label><input type="time" id="sVon" value="06:00"></div>
+        <div class="field"><label>Bis</label><input type="time" id="sBis" value="13:00"></div>
+      </div>
+      <div class="field"><label>Pause (Minuten)</label><input type="number" id="sPause" value="30"></div>
+      <div class="field" style="display:flex;align-items:center;gap:0.6rem;">
+        <input type="checkbox" id="sFeiertag">
+        <label style="margin-bottom:0;cursor:pointer;" for="sFeiertag">Gesetzlicher Feiertag 🎉</label>
+      </div>
+      <div class="field"><label>Notiz</label><input type="text" id="sNotiz" placeholder="Optional..."></div>
+
+```
+  <div id="vorschau" style="display:none;margin:1rem 0;">
+    <div class="card" style="background:var(--surface2);padding:1rem;">
+      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.5rem;letter-spacing:0.08em;">VORSCHAU</div>
+      <div id="vorschau-inhalt"></div>
+    </div>
+  </div>
+  <div class="btn-group">
+    <button class="btn btn-secondary" onclick="zeigeVorschau()">👁 Vorschau</button>
+    <button class="btn btn-primary" onclick="hinzufuegen()">+ Hinzufügen</button>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <div class="card-title" style="margin-bottom:0;"><div class="dot"></div>Erfasste Schichten</div>
+    <button class="btn btn-sm btn-danger" onclick="alleWeg()">🗑 Alle löschen</button>
+  </div>
+  <div id="schicht-liste"></div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ══════════ AUSWERTUNG ══════════ -->
+
+<div id="tab-auswertung" class="section-hidden container">
+  <div class="grid-4" id="stat-row" style="margin-bottom:1.5rem;"></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Zuschläge aufgeschlüsselt</div>
+      <div id="aufschluss"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="dot dot-blue"></div>Schichtstatistik</div>
+      <div id="statistik"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.2rem;">
+    <div class="card-title"><div class="dot dot-green"></div>Einzelübersicht aller Schichten</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Datum</th><th>Art</th><th>Von–Bis</th><th>Netto h</th>
+            <th>Grundlohn</th><th>Nacht</th><th>Sa/So</th><th>Feiertag</th><th>Mehrarbeit</th><th>Brutto</th>
+          </tr>
+        </thead>
+        <tbody id="detail-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LOHNCHECK ══════════ -->
+
+<div id="tab-check" class="section-hidden container">
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Lohnabrechnung prüfen</div>
+        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Gib die Werte von deiner Abrechnung ein. Der LohnCheck vergleicht sie mit deinen erfassten Schichten.</p>
+        <div class="field"><label>Monat (Abrechnungszeitraum)</label><input type="month" id="ck_monat"></div>
+        <div class="field"><label>Brutto-Lohn laut Abrechnung (€)</label><input type="number" id="ck_brutto" step="0.01" placeholder="z.B. 2450.00"></div>
+        <div class="field"><label>Grundlohn laut Abrechnung (€)</label><input type="number" id="ck_grund" step="0.01" placeholder="z.B. 2100.00"></div>
+        <div class="field"><label>Stunden laut Abrechnung (h)</label><input type="number" id="ck_stunden" step="0.5" placeholder="z.B. 168"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:0.5rem;" onclick="lohnCheck()">🔍 Jetzt prüfen</button>
+      </div>
+
+```
+  <div class="card" style="margin-top:1.2rem;">
+    <div class="card-title"><div class="dot dot-blue"></div>Rechtliche Infos</div>
+    <div class="row"><span class="row-label">§3b EStG: Nacht steuerfrei bis</span><span class="green">25%</span></div>
+    <div class="row"><span class="row-label">§3b EStG: Sonntag steuerfrei bis</span><span class="green">50%</span></div>
+    <div class="row"><span class="row-label">§3b EStG: Feiertag steuerfrei bis</span><span class="green">125%</span></div>
+    <div class="row"><span class="row-label">Mindestlohn 2025</span><span class="accent">12,82 €/h</span></div>
+    <div class="row"><span class="row-label">Stundenkonto-Grenze (BV)</span><span class="blue">200 h</span></div>
+    <div class="row" style="border:none;"><span class="row-label">Betriebsrat Edewecht</span><span class="blue">04405/188-43144</span></div>
+    <div class="tip" style="margin-top:0.8rem;">TV-Zuschläge können die steuerfreien Grenzen übersteigen. Nur der Teil bis zur §3b-Grenze ist steuerfrei.</div>
+  </div>
+</div>
+
+<div id="check-ergebnis">
+  <div class="card">
+    <div style="text-align:center;padding:3rem;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔍</div>
+      <div>Gib deine Abrechnungsdaten ein und starte den Check.</div>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+// ── TARIF ──────────────────────────────────────────────────────────
+const LOHNGRUPPEN = [
+  {gr:1,  std:16.84},{gr:2,  std:18.66},{gr:3,  std:19.77},{gr:4,  std:20.45},{gr:5,  std:21.37},
+  {gr:6,  std:22.82},{gr:7,  std:24.67},{gr:'7a',std:27.16},{gr:8,  std:29.65},{gr:9,  std:32.44},{gr:10, std:35.23}
+];
+
+// Rotation: [Woche][Tag 0=Mo..6=So] = 'frueh'|'spaet'|'nacht'|'frei'
+const ROTATION = [
+  ['frueh','frueh','spaet','spaet','nacht','nacht','nacht'],  // W1
+  ['frei', 'frei', 'frueh','frueh','spaet','spaet','spaet'],  // W2
+  ['nacht','nacht','frei', 'frei', 'frueh','frueh','frueh'],  // W3
+  ['spaet','spaet','nacht','nacht','frei', 'frei', 'frei' ],  // W4
+  ['frei', 'frei', 'frei', 'frei', 'frei', 'frei', 'frei' ],  // W5 ZBV
+];
+const TAGNAME = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let einst = JSON.parse(localStorage.getItem('dmk_einst') || 'null') || {
+  stundenLohn:18.66, lohngruppe:'2',
+  fruehVon:'06:00',fruehBis:'13:00',spaetVon:'13:00',spaetBis:'20:00',nachtVon:'20:00',nachtBis:'06:00',
+  pauseMin:30,
+  z_nacht:50,z_mehr:25,z_so:50,z_sa1:15,z_sa2:50,z_ft_woche:175,z_ft_so:75,mehr_ab:40
+};
+let schichten = JSON.parse(localStorage.getItem('dmk_schichten') || '[]');
+
+// ── INIT ───────────────────────────────────────────────────────────
+function init() {
+  // LG Buttons
+  document.getElementById('lg-buttons').innerHTML = LOHNGRUPPEN.map(l =>
+    `<div class="lg-btn ${String(l.gr)===String(einst.lohngruppe)?'active':''}" onclick="waehleLG('${l.gr}',${l.std})">
+      <span class="lg-num">${l.gr}</span>
+      <span class="lg-lohn">${l.std.toFixed(2)}€</span>
+    </div>`
+  ).join('');
+
+  const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
+    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab'];
+  felder.forEach(id => { const el=document.getElementById(id); if(el) el.value=einst[id]; });
+
+  const today = new Date().toISOString().split('T')[0];
+  if(document.getElementById('sDatum')) document.getElementById('sDatum').value = today;
+  if(document.getElementById('ck_monat')) document.getElementById('ck_monat').value = today.substring(0,7);
+
+  // Rotation Start = letzter Montag
+  const d = new Date(); const dow = d.getDay(); const diff = dow===0?6:dow-1;
+  d.setDate(d.getDate()-diff);
+  if(document.getElementById('rotStart')) document.getElementById('rotStart').value = d.toISOString().split('T')[0];
+
+  renderRotationSchema();
+  renderRotation();
+  renderSchichten();
+  updateAuswertung();
+}
+
+function waehleLG(gr, std) {
+  document.querySelectorAll('.lg-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('stundenLohn').value = std;
+  document.getElementById('lohngruppe').value = gr;
+}
+
+function speichern() {
+  const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
+    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab'];
+  felder.forEach(id => {
+    const el=document.getElementById(id); if(!el) return;
+    einst[id] = (el.type==='text'||el.type==='time') ? el.value : parseFloat(el.value)||0;
+  });
+  localStorage.setItem('dmk_einst', JSON.stringify(einst));
+  schichten = schichten.map(s => ({...s, ...berechne(s.datum,s.von,s.bis,s.pause,s.feiertag)}));
+  localStorage.setItem('dmk_schichten', JSON.stringify(schichten));
+  updateAuswertung();
+  alert('✅ Gespeichert & alle Schichten neu berechnet!');
+}
+
+// ── BERECHNUNG ─────────────────────────────────────────────────────
+function berechne(datum, von, bis, pauseMin, istFeiertag) {
+  const [vh,vm]=von.split(':').map(Number), [bh,bm]=bis.split(':').map(Number);
+  let vonM=vh*60+vm, bisM=bh*60+bm;
+  if(bisM<=vonM) bisM+=1440;
+  const nettoMin=(bisM-vonM)-(parseInt(pauseMin)||0);
+  const nettoH=nettoMin/60;
+
+  const date=new Date(datum+'T12:00:00');
+  const tag=date.getDay(); // 0=So,6=Sa
+  const istSonntag=tag===0, istSamstag=tag===6;
+  const sl=einst.stundenLohn;
+
+  // Nacht: 20:00–05:00
+  let nachtH=0;
+  for(let m=vonM;m<bisM-(parseInt(pauseMin)||0);m++){
+    const mod=m%1440;
+    if(mod>=20*60||mod<5*60) nachtH+=1/60;
+  }
+
+  // Samstag bis/ab 13h
+  let sa1H=0,sa2H=0;
+  if(istSamstag&&!istFeiertag){
+    for(let m=vonM;m<bisM-(parseInt(pauseMin)||0);m++){
+      const mod=m%1440;
+      if(mod<13*60) sa1H+=1/60; else sa2H+=1/60;
+    }
+  }
+
+  const soH=(istSonntag&&!istFeiertag)?nettoH:0;
+  const ftH=istFeiertag?nettoH:0;
+
+  const grundlohn=nettoH*sl;
+  const zNacht=nachtH*sl*(einst.z_nacht/100);
+  const zSa1=sa1H*sl*(einst.z_sa1/100);
+  const zSa2=sa2H*sl*(einst.z_sa2/100);
+  const zSo=soH*sl*(einst.z_so/100);
+  const zFt=ftH*sl*((istSonntag?einst.z_ft_so:einst.z_ft_woche)/100);
+  const tagessoll=einst.mehr_ab/5;
+  const mehrH=Math.max(0,nettoH-tagessoll);
+  const zMehr=mehrH*sl*(einst.z_mehr/100);
+  const zuschlaege=zNacht+zSa1+zSa2+zSo+zFt+zMehr;
+  const brutto=grundlohn+zuschlaege;
+
+  return {nettoH,grundlohn,nachtH,sa1H,sa2H,soH,ftH,mehrH,zNacht,zSa1,zSa2,zSo,zFt,zMehr,zuschlaege,brutto,istSonntag,istSamstag,istFeiertag};
+}
+
+// ── ROTATION ───────────────────────────────────────────────────────
+function schichtBadge(art,small) {
+  const cls={frueh:'badge-early',spaet:'badge-late',nacht:'badge-night',frei:'badge-free'};
+  const lbl={frueh:'F',spaet:'S',nacht:'N',frei:'∅'};
+  const lblL={frueh:'Früh',spaet:'Spät',nacht:'Nacht',frei:'Frei'};
+  return `<span class="badge ${cls[art]||''}" style="font-size:${small?'0.58':'0.67'}rem;">${small?lbl[art]:lblL[art]}</span>`;
+}
+
+function renderRotationSchema() {
+  const div=document.getElementById('rotation-schema');
+  const wn=['Woche 1','Woche 2','Woche 3','Woche 4','Woche 5 (ZBV/Frei)'];
+  div.innerHTML=ROTATION.map((days,wi)=>`
+    <div class="rotation-block">
+      <div class="rotation-header"><span>${wn[wi]}</span></div>
+      <div class="rotation-days">
+        ${days.map((art,di)=>`<div class="rot-day"><div class="d">${TAGNAME[di]}</div>${schichtBadge(art,true)}</div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderRotation() {
+  const sv=document.getElementById('rotStart').value;
+  const div=document.getElementById('rotation-kalender');
+  if(!sv){div.innerHTML='<div style="color:var(--muted);font-size:0.8rem;">Bitte Datum wählen.</div>';return;}
+  const start=new Date(sv+'T12:00:00');
+  let html='';
+  for(let wi=0;wi<5;wi++){
+    const days=ROTATION[wi];
+    const w1=new Date(start);w1.setDate(start.getDate()+wi*7);
+    const w7=new Date(start);w7.setDate(start.getDate()+wi*7+6);
+    html+=`<div class="rotation-block">
+      <div class="rotation-header">
+        <span>${wi<4?'Woche '+(wi+1):'Woche 5 — ZBV/Frei'}</span>
+        <span style="color:var(--muted);font-size:0.65rem;">${fmtShort(w1)}–${fmtShort(w7)}</span>
+      </div>
+      <div class="rotation-days">
+        ${days.map((art,di)=>{
+          const d=new Date(start);d.setDate(start.getDate()+wi*7+di);
+          const isSo=d.getDay()===0,isSa=d.getDay()===6;
+          return `<div class="rot-day">
+            <div class="d">${TAGNAME[di]}</div>
+            <div style="font-size:0.63rem;color:var(--muted);margin-bottom:2px;">${d.getDate()}.${d.getMonth()+1}.</div>
+            ${schichtBadge(art,true)}
+            ${isSo&&art!=='frei'?'<div style="font-size:0.55rem;color:var(--accent2);margin-top:1px;">+So</div>':''}
+            ${isSa&&art!=='frei'?'<div style="font-size:0.55rem;color:var(--green);margin-top:1px;">+Sa</div>':''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  div.innerHTML=html;
+}
+
+function importiereRotation() {
+  const sv=document.getElementById('rotStart').value;
+  if(!sv){alert('Bitte Startdatum wählen.');return;}
+  const start=new Date(sv+'T12:00:00');
+  const zeiten={frueh:{von:einst.fruehVon,bis:einst.fruehBis},spaet:{von:einst.spaetVon,bis:einst.spaetBis},nacht:{von:einst.nachtVon,bis:einst.nachtBis}};
+  let added=0;
+  for(let wi=0;wi<5;wi++){
+    for(let di=0;di<7;di++){
+      const art=ROTATION[wi][di];
+      if(art==='frei') continue;
+      const d=new Date(start);d.setDate(start.getDate()+wi*7+di);
+      const datum=d.toISOString().split('T')[0];
+      if(schichten.find(s=>s.datum===datum&&s.art===art)) continue;
+      const z=zeiten[art];
+      const r=berechne(datum,z.von,z.bis,einst.pauseMin,false);
+      schichten.push({id:Date.now()+Math.random(),datum,von:z.von,bis:z.bis,pause:einst.pauseMin,feiertag:false,art,notiz:'Auto',...r});
+      added++;
+    }
+  }
+  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
+  renderSchichten();updateAuswertung();
+  alert(`✅ ${added} Schichten eingetragen! Feiertage bitte manuell markieren.`);
+  showTab('schichten',document.querySelectorAll('.tab')[2]); document.querySelectorAll('.bnav-btn')[2].classList.add('active');
+}
+
+// ── SCHICHTEN ──────────────────────────────────────────────────────
+function schichtArtWaehlen(){
+  const art=document.getElementById('sArt').value;
+  const zeiten={frueh:[einst.fruehVon,einst.fruehBis],spaet:[einst.spaetVon,einst.spaetBis],nacht:[einst.nachtVon,einst.nachtBis]};
+  const isCustom=art==='custom';
+  document.getElementById('sVon').disabled=!isCustom;
+  document.getElementById('sBis').disabled=!isCustom;
+  if(!isCustom){const[v,b]=zeiten[art];document.getElementById('sVon').value=v;document.getElementById('sBis').value=b;}
+}
+
+function zeigeVorschau(){
+  const datum=document.getElementById('sDatum').value,von=document.getElementById('sVon').value,bis=document.getElementById('sBis').value;
+  const pause=document.getElementById('sPause').value,feiertag=document.getElementById('sFeiertag').checked;
+  if(!datum||!von||!bis){alert('Bitte Datum, Von und Bis angeben.');return;}
+  const r=berechne(datum,von,bis,pause,feiertag);
+  document.getElementById('vorschau').style.display='block';
+  document.getElementById('vorschau-inhalt').innerHTML=`
+    <div class="row"><span class="row-label">Nettostunden</span><span>${r.nettoH.toFixed(2)} h</span></div>
+    <div class="row"><span class="row-label">Grundlohn</span><span>${fmt(r.grundlohn)}</span></div>
+    <div class="row"><span class="row-label">🌙 Nacht (${r.nachtH.toFixed(2)}h × ${einst.z_nacht}%)</span><span class="green">+${fmt(r.zNacht)}</span></div>
+    <div class="row"><span class="row-label">🟡 Sa bis 13h (${r.sa1H.toFixed(2)}h × ${einst.z_sa1}%)</span><span class="green">+${fmt(r.zSa1)}</span></div>
+    <div class="row"><span class="row-label">🟠 Sa ab 13h (${r.sa2H.toFixed(2)}h × ${einst.z_sa2}%)</span><span class="green">+${fmt(r.zSa2)}</span></div>
+    <div class="row"><span class="row-label">☀️ Sonntag (${r.soH.toFixed(2)}h × ${einst.z_so}%)</span><span class="green">+${fmt(r.zSo)}</span></div>
+    <div class="row"><span class="row-label">🔴 Feiertag (${r.ftH.toFixed(2)}h)</span><span class="green">+${fmt(r.zFt)}</span></div>
+    <div class="row"><span class="row-label">⏱ Mehrarbeit (${r.mehrH.toFixed(2)}h × ${einst.z_mehr}%)</span><span class="green">+${fmt(r.zMehr)}</span></div>
+    <div class="row" style="border-top:1px solid var(--border);padding-top:0.7rem;margin-top:0.3rem;">
+      <span style="font-weight:500;">💰 Brutto</span>
+      <span style="color:var(--green);font-weight:500;font-size:1.1rem;">${fmt(r.brutto)}</span>
+    </div>`;
+}
+
+function hinzufuegen(){
+  const datum=document.getElementById('sDatum').value,von=document.getElementById('sVon').value,bis=document.getElementById('sBis').value;
+  const pause=parseInt(document.getElementById('sPause').value)||0,feiertag=document.getElementById('sFeiertag').checked;
+  const notiz=document.getElementById('sNotiz').value,art=document.getElementById('sArt').value;
+  if(!datum||!von||!bis){alert('Pflichtfelder fehlen.');return;}
+  const r=berechne(datum,von,bis,pause,feiertag);
+  schichten.push({id:Date.now(),datum,von,bis,pause,feiertag,notiz,art,...r});
+  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
+  renderSchichten();updateAuswertung();
+  document.getElementById('vorschau').style.display='none';
+  document.getElementById('sNotiz').value='';
+  document.getElementById('sFeiertag').checked=false;
+}
+
+function loeschen(id){
+  schichten=schichten.filter(s=>s.id!==id);
+  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
+  renderSchichten();updateAuswertung();
+}
+
+function alleWeg(){
+  if(confirm('Alle Schichten löschen?')){schichten=[];localStorage.removeItem('dmk_schichten');renderSchichten();updateAuswertung();}
+}
+
+function renderSchichten(){
+  const div=document.getElementById('schicht-liste');
+  if(!schichten.length){
+    div.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>Noch keine Schichten erfasst.</div>`;
+    return;
+  }
+  const sorted=[...schichten].sort((a,b)=>new Date(b.datum)-new Date(a.datum));
+  const artCls={frueh:'badge-early',spaet:'badge-late',nacht:'badge-night',custom:'badge-free'};
+  const artLbl={frueh:'Früh',spaet:'Spät',nacht:'Nacht',custom:'Eigen'};
+  div.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.5rem;max-height:520px;overflow-y:auto;">
+    ${sorted.map(s=>`
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="badge ${artCls[s.art]||''}">${artLbl[s.art]||s.art}</span>
+            <span style="color:var(--muted);font-size:0.72rem;">${fmtDatum(s.datum)}</span>
+            ${s.feiertag?'<span style="font-size:0.8rem;">🎉</span>':''}
+            ${s.istSonntag?'<span style="font-size:0.8rem;">☀️</span>':''}
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="loeschen(${s.id})" style="padding:0.3rem 0.6rem;">✕</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:0.8rem;align-items:center;">
+            <span style="font-size:0.8rem;">${s.von}–${s.bis}</span>
+            <span class="accent" style="font-size:0.78rem;">${s.nettoH.toFixed(1)}h</span>
+            ${s.notiz?`<span style="color:var(--muted);font-size:0.7rem;">${s.notiz}</span>`:''}
+          </div>
+          <span class="green" style="font-weight:600;font-size:0.92rem;">${fmt(s.brutto)}</span>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ── AUSWERTUNG ─────────────────────────────────────────────────────
+function updateAuswertung(){
+  const sum=k=>schichten.reduce((s,x)=>s+(x[k]||0),0);
+  const totH=sum('nettoH'),totGrund=sum('grundlohn'),totZusch=sum('zuschlaege'),totBrutto=sum('brutto');
+  const totNacht=sum('zNacht'),totSa1=sum('zSa1'),totSa2=sum('zSa2'),totSo=sum('zSo'),totFt=sum('zFt'),totMehr=sum('zMehr');
+
+  document.getElementById('stat-row').innerHTML=[
+    {l:'Gesamtstunden',v:totH.toFixed(1)+'h',  sub:schichten.length+' Schichten',       c:'var(--blue)'},
+    {l:'Grundlohn',    v:fmt(totGrund),          sub:'ohne Zuschläge',                   c:'var(--accent)'},
+    {l:'Zuschläge',    v:fmt(totZusch),          sub:(totBrutto>0?(totZusch/totBrutto*100).toFixed(1):0)+'% des Bruttos', c:'var(--green)'},
+    {l:'Brutto-Lohn',  v:fmt(totBrutto),         sub:'inkl. aller Zuschläge',             c:'var(--accent2)'},
+  ].map(s=>`<div class="stat" style="--stat-color:${s.c}"><div class="stat-label">${s.l}</div><div class="stat-value">${s.v}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+
+  const pct=v=>totBrutto>0?(v/totBrutto*100):0;
+  const auf=document.getElementById('aufschluss');
+  if(!schichten.length){auf.innerHTML='<div style="color:var(--muted);padding:1rem 0;font-size:0.8rem;">Keine Daten vorhanden.</div>';return;}
+  auf.innerHTML=[
+    {l:'🌙 Nacht (20–05h)',   v:totNacht,    c:'var(--blue)'},
+    {l:'🟡 Sa bis 13h',       v:totSa1,     c:'#86efac'},
+    {l:'🟠 Sa ab 13h',        v:totSa2,     c:'var(--green)'},
+    {l:'☀️ Sonntag',          v:totSo,      c:'var(--accent2)'},
+    {l:'🔴 Feiertag',         v:totFt,      c:'var(--danger)'},
+    {l:'⏱ Mehrarbeit',        v:totMehr,    c:'var(--purple)'},
+  ].map(x=>`
+    <div class="row"><span class="row-label">${x.l}</span><span style="color:${x.c};">${fmt(x.v)}</span></div>
+    <div class="progress"><div class="progress-fill" style="width:${pct(x.v)}%;background:${x.c};"></div></div>
+  `).join('')+`
+    <div class="row" style="border-top:1px solid var(--border);margin-top:0.3rem;padding-top:0.7rem;">
+      <span>Zuschläge gesamt</span><span class="green">${fmt(totZusch)}</span>
+    </div>`;
+
+  const nNacht=schichten.filter(s=>s.nachtH>0).length;
+  const nSo=schichten.filter(s=>s.istSonntag).length;
+  const nSa=schichten.filter(s=>s.istSamstag).length;
+  const nFt=schichten.filter(s=>s.istFeiertag).length;
+  const effStd=totH>0?totBrutto/totH:0;
+  document.getElementById('statistik').innerHTML=`
+    <div class="row"><span class="row-label">Schichten gesamt</span><span>${schichten.length}</span></div>
+    <div class="row"><span class="row-label">🌙 Nachtschichten</span><span class="blue">${nNacht}</span></div>
+    <div class="row"><span class="row-label">☀️ Sonntagsschichten</span><span class="orange">${nSo}</span></div>
+    <div class="row"><span class="row-label">🟡 Samstagschichten</span><span class="green">${nSa}</span></div>
+    <div class="row"><span class="row-label">🔴 Feiertagsschichten</span><span class="red">${nFt}</span></div>
+    <div class="row"><span class="row-label">⌀ Std/Schicht</span><span>${(totH/schichten.length).toFixed(2)}h</span></div>
+    <div class="row"><span class="row-label">⌀ Eff. Stundenlohn</span><span class="green">${fmt(effStd)}/h</span></div>
+    <div class="row" style="border:none;"><span class="row-label">Mindestlohn-Check</span>
+      <span class="${effStd>=12.82?'green':'red'}">${totH>0?(effStd>=12.82?'✓ OK':'⚠ Prüfen!'):'-'}</span>
+    </div>`;
+
+  const tbody=document.getElementById('detail-table');
+  if(!tbody) return;
+  const artLbl2={frueh:'🌅 Früh',spaet:'🌆 Spät',nacht:'🌙 Nacht',custom:'✏️ Eigen'};
+  const sorted=[...schichten].sort((a,b)=>new Date(a.datum)-new Date(b.datum));
+  tbody.innerHTML=sorted.map(s=>`
+    <tr>
+      <td>${fmtDatum(s.datum)}</td>
+      <td>${artLbl2[s.art]||s.art} ${s.feiertag?'🎉':''}</td>
+      <td>${s.von}–${s.bis}</td>
+      <td>${s.nettoH.toFixed(2)}</td>
+      <td>${fmt(s.grundlohn)}</td>
+      <td class="blue">${s.zNacht>0?fmt(s.zNacht):'-'}</td>
+      <td class="green">${(s.zSa1+s.zSa2+s.zSo)>0?fmt(s.zSa1+s.zSa2+s.zSo):'-'}</td>
+      <td class="red">${s.zFt>0?fmt(s.zFt):'-'}</td>
+      <td class="purple">${s.zMehr>0?fmt(s.zMehr):'-'}</td>
+      <td class="accent" style="font-weight:500;">${fmt(s.brutto)}</td>
+    </tr>`).join('')+
+    `<tr class="tr-total">
+      <td colspan="3">Gesamt</td><td>${totH.toFixed(2)}</td><td>${fmt(totGrund)}</td>
+      <td>${fmt(totNacht)}</td><td>${fmt(totSa1+totSa2+totSo)}</td><td>${fmt(totFt)}</td><td>${fmt(totMehr)}</td><td>${fmt(totBrutto)}</td>
+    </tr>`;
+}
+
+// ── LOHNCHECK ──────────────────────────────────────────────────────
+function lohnCheck(){
+  const erhalten=parseFloat(document.getElementById('ck_brutto').value);
+  const angGrund=parseFloat(document.getElementById('ck_grund').value)||0;
+  const angStd=parseFloat(document.getElementById('ck_stunden').value)||0;
+  const monat=document.getElementById('ck_monat').value;
+  if(!erhalten){alert('Bitte Brutto-Lohn eingeben.');return;}
+
+  const ms=monat?schichten.filter(s=>s.datum.startsWith(monat)):schichten;
+  const totH=ms.reduce((s,x)=>s+x.nettoH,0);
+  const totGrund=ms.reduce((s,x)=>s+x.grundlohn,0);
+  const totZusch=ms.reduce((s,x)=>s+x.zuschlaege,0);
+  const totBrutto=ms.reduce((s,x)=>s+x.brutto,0);
+  const diff=erhalten-totBrutto;
+  const diffPct=totBrutto>0?(Math.abs(diff)/totBrutto*100):0;
+
+  let alerts='';
+  if(!ms.length) alerts+=`<div class="alert alert-warn">⚠️ Keine Schichten für ${monat} gefunden. Bitte erst Schichten erfassen.</div>`;
+  else if(Math.abs(diff)<1) alerts+=`<div class="alert alert-ok">✅ Abrechnung stimmt! Differenz: ${fmt(diff)}</div>`;
+  else if(diff<0) alerts+=`<div class="alert alert-err">⚠️ Mögliche Unterzahlung: <strong>${fmt(Math.abs(diff))}</strong> (${diffPct.toFixed(1)}%) zu wenig. Betriebsrat kontaktieren!</div><div class="alert alert-info">📞 Betriebsrat Edewecht: 04405/188-43144</div>`;
+  else alerts+=`<div class="alert alert-warn">ℹ️ ${fmt(diff)} mehr als erwartet. Evtl. Prämie, Ausgleich, Schichtzulage?</div>`;
+
+  if(angGrund&&totGrund>0&&Math.abs(angGrund-totGrund)>2) alerts+=`<div class="alert alert-warn">⚠️ Grundlohn-Diff: erwartet ${fmt(totGrund)}, erhalten ${fmt(angGrund)} (Δ ${fmt(angGrund-totGrund)})</div>`;
+  if(angStd&&totH>0&&Math.abs(angStd-totH)>0.5) alerts+=`<div class="alert alert-warn">⚠️ Stunden-Diff: erwartet ${totH.toFixed(1)}h, laut Abrechnung ${angStd}h</div>`;
+
+  document.getElementById('check-ergebnis').innerHTML=`
+    <div class="card animate-in">
+      <div class="card-title"><div class="dot"></div>Ergebnis ${monat||'(alle Schichten)'}</div>
+      ${alerts}
+      <div class="sep"></div>
+      <div class="row"><span class="row-label">Analysierte Schichten</span><span>${ms.length}</span></div>
+      <div class="row"><span class="row-label">Berechneter Grundlohn</span><span>${fmt(totGrund)}</span></div>
+      <div class="row"><span class="row-label">Berechnete Zuschläge</span><span class="green">${fmt(totZusch)}</span></div>
+      <div class="row"><span class="row-label">Erwarteter Brutto</span><span class="accent">${fmt(totBrutto)}</span></div>
+      <div class="row"><span class="row-label">Erhaltener Brutto</span><span style="color:${diff>=0?'var(--green)':'var(--danger)'};">${fmt(erhalten)}</span></div>
+      <div class="row" style="border:none;">
+        <span class="row-label">Differenz</span>
+        <span style="color:${Math.abs(diff)<1?'var(--green)':diff>0?'var(--accent)':'var(--danger)'};font-weight:500;">
+          ${diff>=0?'+':''}${fmt(diff)}
+        </span>
+      </div>
+    </div>`;
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────
+function fmt(n){return (n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});}
+function fmtDatum(d){const date=new Date(d+'T12:00:00');const t=['So','Mo','Di','Mi','Do','Fr','Sa'];return `${t[date.getDay()]} ${d.split('-').reverse().join('.')}`;}
+function fmtShort(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
+
+function showTab(id,btn){
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>{el.classList.remove('section-visible','animate-in');el.classList.add('section-hidden');});
+  document.querySelectorAll('.tab, .bnav-btn').forEach(t=>t.classList.remove('active'));
+  const el=document.getElementById('tab-'+id);
+  el.classList.remove('section-hidden');el.classList.add('section-visible','animate-in');
+  if(btn) btn.classList.add('active');
+  if(id==='auswertung'||id==='check') updateAuswertung();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+init();
+</script>
+
+</body>
+</html>
