@@ -4,1243 +4,1494 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LohnCheck — DMK Edewecht</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<title>Arbeitszeiterfassung & Entgeltabrechnung 2024</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-  --bg: #0c0e12;
-  --surface: #13161d;
-  --surface2: #1a1e28;
-  --surface3: #21263a;
-  --border: #252b3b;
-  --accent: #f0c040;
-  --accent2: #ff6b4a;
-  --green: #4ade80;
-  --blue: #60a5fa;
-  --purple: #a78bfa;
-  --text: #e8eaf0;
-  --muted: #5a6180;
-  --danger: #f87171;
+–bg: #0f1117;
+–surface: #1a1d2e;
+–surface2: #242740;
+–border: #2e3250;
+–accent: #4f6ef7;
+–accent2: #7c3aed;
+–green: #22c55e;
+–red: #ef4444;
+–yellow: #eab308;
+–orange: #f97316;
+–text: #e2e8f0;
+–text2: #94a3b8;
+–text3: #64748b;
+–radius: 10px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: 'DM Mono', monospace;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 10% 0%, rgba(240,192,64,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(96,165,250,0.05) 0%, transparent 60%);
+font-family: ‘Inter’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+font-size: 14px;
 }
+
+/* ── Layout ── */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
 header {
-  padding: 1.4rem 2.5rem;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+padding: 16px 24px;
+display: flex;
+align-items: center;
+gap: 16px;
+position: sticky;
+top: 0;
+z-index: 100;
 }
-.logo { display: flex; align-items: center; gap: 1rem; }
-.logo-icon {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--accent), #e0a820);
-  border-radius: 10px;
-  display: grid; place-items: center; font-size: 1.2rem;
-  box-shadow: 0 0 20px rgba(240,192,64,0.3);
+
+.logo { font-size: 22px; }
+.header-title { font-size: 18px; font-weight: 700; }
+.header-sub { font-size: 12px; color: var(–text2); margin-top: 2px; }
+
+nav {
+display: flex;
+gap: 4px;
+padding: 12px 24px;
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+overflow-x: auto;
 }
-h1 { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
-h1 span { color: var(--accent); }
-.header-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
-.header-badge { font-size: 0.7rem; padding: 0.3rem 0.8rem; background: rgba(240,192,64,0.1); color: var(--accent); border: 1px solid rgba(240,192,64,0.3); border-radius: 20px; }
-nav { display: flex; border-bottom: 1px solid var(--border); padding: 0 2.5rem; overflow-x: auto; }
-.tab { padding: 0.8rem 1.4rem; cursor: pointer; font-size: 0.75rem; color: var(--muted); border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; font-family: 'DM Mono', monospace; transition: all 0.15s; white-space: nowrap; }
-.tab:hover { color: var(--text); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.container { max-width: 1280px; margin: 0 auto; padding: 2rem 2.5rem; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; }
-.card-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-.dot-blue { background: var(--blue); }
-.dot-green { background: var(--green); }
-.dot-purple { background: var(--purple); }
-label { display: block; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.06em; }
-input, select { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 0.6rem 0.85rem; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 0.83rem; transition: border-color 0.15s; outline: none; margin-bottom: 0; }
-input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(240,192,64,0.1); }
-input[type="checkbox"] { width: auto; cursor: pointer; }
-.field { margin-bottom: 1rem; }
-.field:last-child { margin-bottom: 0; }
-.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.3rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
-.btn-primary { background: var(--accent); color: #0c0e12; }
-.btn-primary:hover { background: #f5cc55; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(240,192,64,0.3); }
-.btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.72rem; }
-.btn-danger { background: transparent; color: var(--danger); border: 1px solid rgba(248,113,113,0.4); }
-.btn-danger:hover { background: rgba(248,113,113,0.1); }
-.btn-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.4rem; position: relative; overflow: hidden; }
-.stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--stat-color, var(--accent)); }
-.stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
-.stat-value { font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 700; color: var(--stat-color, var(--accent)); line-height: 1; }
-.stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 0.4rem; }
+
+.nav-btn {
+padding: 7px 16px;
+border-radius: 20px;
+border: 1px solid var(–border);
+background: transparent;
+color: var(–text2);
+cursor: pointer;
+font-size: 13px;
+font-family: inherit;
+white-space: nowrap;
+transition: all .15s;
+}
+.nav-btn:hover { background: var(–surface2); color: var(–text); }
+.nav-btn.active { background: var(–accent); border-color: var(–accent); color: #fff; font-weight: 600; }
+
+main { flex: 1; padding: 24px; }
+
+/* ── Section ── */
+.section { display: none; }
+.section.visible { display: block; }
+
+/* ── Card ── */
+.card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 20px;
+margin-bottom: 16px;
+}
+.card-title {
+font-size: 15px;
+font-weight: 600;
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+/* ── Grid stats ── */
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+gap: 12px;
+margin-bottom: 20px;
+}
+.stat-card {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 14px 16px;
+}
+.stat-label { font-size: 11px; color: var(–text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.stat-value { font-size: 22px; font-weight: 700; font-family: ‘JetBrains Mono’, monospace; }
+.stat-sub { font-size: 11px; color: var(–text3); margin-top: 3px; }
+.stat-green .stat-value { color: var(–green); }
+.stat-blue .stat-value { color: var(–accent); }
+.stat-yellow .stat-value { color: var(–yellow); }
+.stat-red .stat-value { color: var(–red); }
+.stat-orange .stat-value { color: var(–orange); }
+
+/* ── Month picker ── */
+.month-tabs {
+display: flex;
+gap: 6px;
+margin-bottom: 20px;
+flex-wrap: wrap;
+}
+.month-tab {
+padding: 6px 14px;
+border-radius: 6px;
+border: 1px solid var(–border);
+background: transparent;
+color: var(–text2);
+cursor: pointer;
+font-size: 12px;
+font-family: inherit;
+transition: all .15s;
+}
+.month-tab:hover { background: var(–surface2); color: var(–text); }
+.month-tab.active { background: var(–accent2); border-color: var(–accent2); color: #fff; font-weight: 600; }
+.month-tab.has-data { border-color: var(–accent); color: var(–accent); }
+.month-tab.has-data.active { background: var(–accent2); border-color: var(–accent2); color: #fff; }
+
+/* ── Calendar grid ── */
+.calendar-grid {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 4px;
+margin-bottom: 16px;
+}
+.cal-header {
+text-align: center;
+font-size: 11px;
+font-weight: 600;
+color: var(–text3);
+padding: 6px 0;
+text-transform: uppercase;
+letter-spacing: .5px;
+}
+.cal-day {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 8px 6px;
+min-height: 72px;
+cursor: pointer;
+transition: border-color .15s;
+}
+.cal-day:hover { border-color: var(–accent); }
+.cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+.cal-day.weekend { background: #1e2138; }
+.cal-day.holiday { background: #1e2138; border-color: var(–yellow); }
+.cal-day.urlaub { border-color: var(–green); background: #16271e; }
+.cal-day.krank { border-color: var(–red); background: #271616; }
+.cal-day.worked { border-color: #334; }
+.cal-day.today { border-color: var(–accent); }
+
+.cal-day-num {
+font-size: 12px;
+font-weight: 600;
+color: var(–text2);
+margin-bottom: 4px;
+}
+.cal-day.weekend .cal-day-num, .cal-day.holiday .cal-day-num { color: var(–yellow); }
+.cal-day.urlaub .cal-day-num { color: var(–green); }
+.cal-day.krank .cal-day-num { color: var(–red); }
+
+.cal-badge {
+display: inline-block;
+font-size: 9px;
+font-weight: 700;
+padding: 1px 5px;
+border-radius: 3px;
+margin-bottom: 2px;
+}
+.badge-worked { background: #1e3a5f; color: var(–accent); }
+.badge-urlaub { background: #1a3a28; color: var(–green); }
+.badge-krank { background: #3a1a1a; color: var(–red); }
+.badge-feiertag { background: #3a3a1a; color: var(–yellow); }
+.badge-weekend { background: #2a2a3a; color: var(–text3); }
+
+.cal-time {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 9px;
+color: var(–text3);
+}
+
+/* ── Table ── */
 .table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-th { text-align: left; padding: 0.6rem 0.9rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 0.75rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.035); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,0.02); }
-.tr-total td { border-top: 1px solid var(--border); font-weight: 500; color: var(--accent); }
-.badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.18rem 0.5rem; border-radius: 4px; font-size: 0.67rem; font-weight: 500; }
-.badge-night { background: rgba(96,165,250,0.12); color: var(--blue); }
-.badge-late  { background: rgba(167,139,250,0.12); color: var(--purple); }
-.badge-early { background: rgba(240,192,64,0.12); color: var(--accent); }
-.badge-sun   { background: rgba(255,107,74,0.12); color: var(--accent2); }
-.badge-hol   { background: rgba(248,113,113,0.12); color: var(--danger); }
-.badge-sat   { background: rgba(74,222,128,0.12); color: var(--green); }
-.badge-free  { background: rgba(90,97,128,0.12); color: var(--muted); }
-.alert { padding: 0.9rem 1rem; border-radius: 8px; font-size: 0.78rem; margin-bottom: 0.8rem; line-height: 1.5; }
-.alert-ok   { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); color: var(--green); }
-.alert-warn { background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.3); color: var(--accent); }
-.alert-err  { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
-.alert-info { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.3); color: var(--blue); }
-.row { display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; }
-.row:last-child { border-bottom: none; }
-.row-label { color: var(--muted); }
-.row-val { font-weight: 500; }
-.green  { color: var(--green); }
-.blue   { color: var(--blue); }
-.accent { color: var(--accent); }
-.orange { color: var(--accent2); }
-.red    { color: var(--danger); }
-.purple { color: var(--purple); }
-.progress { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin: 0.3rem 0 0.8rem; }
-.progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-.section-hidden  { display: none; }
-.section-visible { display: block; }
-@keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-.animate-in { animation: fadeSlide 0.25s ease forwards; }
-.sep { height: 1px; background: var(--border); margin: 1.2rem 0; }
-.lohn-group-select { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
-.lg-btn { padding: 0.5rem 0.3rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.72rem; transition: all 0.15s; }
-.lg-btn:hover, .lg-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(240,192,64,0.08); }
-.lg-btn .lg-num { font-size: 1rem; font-weight: 700; display: block; color: var(--text); }
-.lg-btn.active .lg-num { color: var(--accent); }
-.lg-btn .lg-lohn { font-size: 0.6rem; color: var(--muted); display: block; }
-.lg-btn.active .lg-lohn { color: var(--accent); }
-.tip { font-size: 0.72rem; color: var(--muted); background: var(--surface2); border-left: 2px solid var(--accent); padding: 0.5rem 0.8rem; border-radius: 0 6px 6px 0; margin-top: 0.6rem; line-height: 1.5; }
-.rotation-block { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 0.8rem; }
-.rotation-header { padding: 0.6rem 1rem; background: var(--surface2); font-size: 0.72rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
-.rotation-days { display: flex; }
-.rot-day { flex: 1; padding: 0.6rem 0.2rem; text-align: center; font-size: 0.68rem; border-right: 1px solid var(--border); }
-.rot-day:last-child { border-right: none; }
-.rot-day .d { color: var(--muted); font-size: 0.6rem; margin-bottom: 2px; }
-/* ── MOBILE BOTTOM NAV ── */
-.bottom-nav {
-  display: none;
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
-  z-index: 100;
-  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+background: var(–surface2);
+padding: 10px 12px;
+text-align: left;
+font-size: 11px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: .5px;
+color: var(–text2);
+border-bottom: 1px solid var(–border);
+white-space: nowrap;
 }
-.bottom-nav-inner { display: flex; justify-content: space-around; }
-.bnav-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 0.4rem 0.6rem; background: none; border: none; cursor: pointer;
-  font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--muted);
-  border-radius: 10px; transition: all 0.15s; min-width: 56px;
+tbody td {
+padding: 9px 12px;
+border-bottom: 1px solid var(–border);
+color: var(–text);
 }
-.bnav-btn .bnav-icon { font-size: 1.3rem; line-height: 1; }
-.bnav-btn.active { color: var(--accent); }
-.bnav-btn.active .bnav-icon { filter: drop-shadow(0 0 4px rgba(240,192,64,0.5)); }
+tbody tr:hover td { background: var(–surface2); }
+tbody tr:last-child td { border-bottom: none; }
 
-@media (max-width: 768px) {
-/* Layout */
-.container { padding: 0.9rem 0.9rem 5.5rem; }
-nav { display: none; }
-header { padding: 0.9rem 1rem; }
-.header-badge { display: none; }
-.bottom-nav { display: block; }
-h1 { font-size: 1.25rem; }
+.mono { font-family: ‘JetBrains Mono’, monospace; }
+.text-right { text-align: right; }
+.text-green { color: var(–green); }
+.text-red { color: var(–red); }
+.text-yellow { color: var(–yellow); }
+.text-blue { color: var(–accent); }
+.text-orange { color: var(–orange); }
+.text-muted { color: var(–text3); }
 
-/* Grids → single column */
-.grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 1rem; }
-
-/* Stat grid: 2×2 on mobile */
-#stat-row { grid-template-columns: 1fr 1fr !important; gap: 0.8rem; }
-.stat-value { font-size: 1.3rem; }
-
-/* Cards */
-.card { padding: 1.1rem; border-radius: 12px; }
-.card-title { font-size: 0.92rem; margin-bottom: 1rem; }
-
-/* Inputs — larger touch targets */
-input, select {
-padding: 0.75rem 0.9rem;
-font-size: 1rem; /* prevents iOS zoom */
-border-radius: 10px;
+/* ── Form ── */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; color: var(–text2); font-weight: 500; }
+.form-group input, .form-group select {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 8px 12px;
+color: var(–text);
+font-family: inherit;
+font-size: 13px;
+outline: none;
+transition: border-color .15s;
 }
-label { font-size: 0.7rem; margin-bottom: 0.4rem; }
-.field { margin-bottom: 1.1rem; }
+.form-group input:focus, .form-group select:focus { border-color: var(–accent); }
 
-/* Buttons — full width & bigger tap area */
-.btn { padding: 0.8rem 1.2rem; font-size: 0.82rem; border-radius: 10px; }
-.btn-group { flex-direction: column; }
-.btn-group .btn { width: 100%; justify-content: center; }
-.btn-sm { padding: 0.5rem 0.8rem; }
-
-/* Lohngruppen — 4 columns on mobile */
-.lohn-group-select { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-.lg-btn .lg-num { font-size: 0.9rem; }
-.lg-btn .lg-lohn { font-size: 0.55rem; }
-
-/* Rotation calendar — smaller text */
-.rot-day { padding: 0.4rem 0.1rem; }
-.rotation-header { font-size: 0.68rem; padding: 0.5rem 0.7rem; flex-direction: column; gap: 2px; }
-
-/* Schicht list items — stack vertically */
-.schicht-mobile { flex-direction: column !important; align-items: flex-start !important; gap: 0.4rem !important; }
-.schicht-mobile .sm-row1 { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
-.schicht-mobile .sm-row2 { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-
-/* Vorschau card spacing */
-#vorschau .card { padding: 0.9rem; }
-
-/* Alert font size */
-.alert { font-size: 0.8rem; }
-
-/* Table — horizontal scroll with hint */
-.table-wrap { -webkit-overflow-scrolling: touch; }
-.table-wrap::after {
-content: ‘← scrollbar →’;
-display: block; text-align: center;
-font-size: 0.62rem; color: var(–muted); padding: 0.4rem;
+.btn {
+padding: 9px 20px;
+border-radius: 6px;
+border: none;
+cursor: pointer;
+font-family: inherit;
+font-size: 13px;
+font-weight: 600;
+transition: opacity .15s;
 }
-table { font-size: 0.72rem; }
-th, td { padding: 0.5rem 0.6rem; }
+.btn:hover { opacity: .85; }
+.btn-primary { background: var(–accent); color: #fff; }
+.btn-secondary { background: var(–surface2); color: var(–text); border: 1px solid var(–border); }
 
-/* Row items bigger */
-.row { padding: 0.75rem 0; font-size: 0.82rem; }
-.tip { font-size: 0.74rem; }
-
-/* Checkbox bigger on mobile */
-input[type=“checkbox”] { width: 20px; height: 20px; accent-color: var(–accent); }
-.field:has(#sFeiertag) { display: flex; align-items: center; gap: 0.7rem; }
-.field:has(#sFeiertag) label { margin-bottom: 0; font-size: 0.82rem; text-transform: none; letter-spacing: 0; }
-
-/* Rotation days font smaller */
-.rot-day { font-size: 0.6rem; }
-.rotation-days { overflow-x: auto; }
-
-/* Lohncheck ergebnis card */
-#check-ergebnis .card { margin-top: 0; }
-
-/* Smooth scrolling hint for schicht list */
-#schicht-liste > div { padding-bottom: 0.5rem; }
+/* ── Detail panel ── */
+.detail-panel {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: var(–radius);
+padding: 16px;
+margin-top: 16px;
 }
+.detail-panel h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.detail-row {
+display: flex;
+justify-content: space-between;
+padding: 6px 0;
+border-bottom: 1px solid var(–border);
+font-size: 13px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-key { color: var(–text2); }
+
+/* ── Legend ── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(–text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── Progress bar ── */
+.progress-bar {
+height: 6px;
+background: var(–border);
+border-radius: 3px;
+overflow: hidden;
+margin-top: 8px;
+}
+.progress-fill {
+height: 100%;
+border-radius: 3px;
+background: var(–accent);
+transition: width .3s;
+}
+
+/* ── Chip ── */
+.chip {
+display: inline-flex;
+align-items: center;
+padding: 3px 10px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 600;
+}
+.chip-green { background: #16271e; color: var(–green); border: 1px solid #22c55e44; }
+.chip-red { background: #271616; color: var(–red); border: 1px solid #ef444444; }
+.chip-yellow { background: #272016; color: var(–yellow); border: 1px solid #eab30844; }
+.chip-blue { background: #161c36; color: var(–accent); border: 1px solid #4f6ef744; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+main { padding: 12px; }
+.calendar-grid { grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day { min-height: 50px; padding: 4px 3px; }
+.stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(–surface); }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+
+.section-divider {
+border: none;
+border-top: 1px solid var(–border);
+margin: 20px 0;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
 </style>
 
 </head>
 <body>
+<div class="app">
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">⚙</div>
+  <header>
+    <span class="logo">📊</span>
     <div>
-      <h1>Lohn<span>Check</span></h1>
-      <div class="header-sub">DMK Edewecht · ETV Allg. · Stand 05/2024</div>
+      <div class="header-title">Arbeitszeiterfassung & Entgeltabrechnung</div>
+      <div class="header-sub">Abrechnungsjahr 2024 · AWSF</div>
     </div>
-  </div>
-  <div class="header-badge">365 Tage Schichtbetrieb</div>
-</header>
+  </header>
 
-<nav>
-  <button class="tab active" onclick="showTab('einst',this)">⚙ Einstellungen</button>
-  <button class="tab" onclick="showTab('rotation',this)">🔄 Schichtrotation</button>
-  <button class="tab" onclick="showTab('schichten',this)">📅 Schichten</button>
-  <button class="tab" onclick="showTab('auswertung',this)">📊 Auswertung</button>
-  <button class="tab" onclick="showTab('check',this)">🔍 Lohncheck</button>
-</nav>
+  <nav>
+    <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showSection('zeiterfassung')">Zeiterfassung</button>
+    <button class="nav-btn" onclick="showSection('entgelt')">Entgeltabrechnung</button>
+    <button class="nav-btn" onclick="showSection('urlaub')">Urlaub & Abwesenheit</button>
+    <button class="nav-btn" onclick="showSection('steuer')">Lohnsteuer</button>
+    <button class="nav-btn" onclick="showSection('eintragen')">Zeiten eintragen</button>
+  </nav>
 
-<!-- ══════════ BOTTOM NAV (mobile) ══════════ -->
-
-<div class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <button class="bnav-btn active" onclick="showTab('einst',this)">
-      <span class="bnav-icon">⚙️</span><span>Einst.</span>
-    </button>
-    <button class="bnav-btn" onclick="showTab('rotation',this)">
-      <span class="bnav-icon">🔄</span><span>Rotation</span>
-    </button>
-    <button class="bnav-btn" onclick="showTab('schichten',this)">
-      <span class="bnav-icon">📅</span><span>Schichten</span>
-    </button>
-    <button class="bnav-btn" onclick="showTab('auswertung',this)">
-      <span class="bnav-icon">📊</span><span>Auswert.</span>
-    </button>
-    <button class="bnav-btn" onclick="showTab('check',this)">
-      <span class="bnav-icon">🔍</span><span>Check</span>
-    </button>
-  </div>
-</div>
-
-<!-- ══════════ EINSTELLUNGEN ══════════ -->
-
-<div id="tab-einst" class="section-visible container animate-in">
-
-  <!-- Zeile 1: Lohngruppe + Zuschläge -->
-
-  <div class="grid-2" style="margin-bottom:1.5rem;">
-    <div>
-      <div class="card">
-        <div class="card-title"><div class="dot"></div>Lohngruppe (ETV Allg. 01.03.2024)</div>
-        <div class="lohn-group-select" id="lg-buttons"></div>
-        <div class="field">
-          <label>Stundenlohn (€/h)</label>
-          <input type="number" id="stundenLohn" step="0.01">
-        </div>
-        <div class="field">
-          <label>Gewählte Lohngruppe</label>
-          <input type="text" id="lohngruppe" readonly style="opacity:0.6;">
-        </div>
-        <div class="tip">💡 Werte gemäß Tarifvertrag DMK Edewecht, 40h/Woche Basis.</div>
-      </div>
+  <main>
 
 ```
-  <div class="card" style="margin-top:1.2rem;">
-    <div class="card-title"><div class="dot dot-blue"></div>Schichtzeiten</div>
-    <div class="grid-2" style="gap:0.8rem;">
-      <div class="field"><label>Frühschicht von</label><input type="time" id="fruehVon" value="06:00"></div>
-      <div class="field"><label>Frühschicht bis</label><input type="time" id="fruehBis" value="13:00"></div>
-      <div class="field"><label>Spätschicht von</label><input type="time" id="spaetVon" value="13:00"></div>
-      <div class="field"><label>Spätschicht bis</label><input type="time" id="spaetBis" value="20:00"></div>
-      <div class="field"><label>Nachtschicht von</label><input type="time" id="nachtVon" value="20:00"></div>
-      <div class="field"><label>Nachtschicht bis</label><input type="time" id="nachtBis" value="06:00"></div>
+<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+<div id="section-dashboard" class="section visible">
+
+  <div class="stats-grid">
+    <div class="stat-card stat-green">
+      <div class="stat-label">Nettolohn (Dez)</div>
+      <div class="stat-value">2.677 €</div>
+      <div class="stat-sub">Brutto: 3.500 €</div>
     </div>
-    <div class="field"><label>Pause (Minuten)</label><input type="number" id="pauseMin" value="30"></div>
+    <div class="stat-card stat-blue">
+      <div class="stat-label">Urlaubsanspruch</div>
+      <div class="stat-value">34 Tage</div>
+      <div class="stat-sub">Zusatz: 4 Tage</div>
+    </div>
+    <div class="stat-card stat-yellow">
+      <div class="stat-label">Urlaubsrest 2024</div>
+      <div class="stat-value">34 Tage</div>
+      <div class="stat-sub">Verbraucht: 0 Tage</div>
+    </div>
+    <div class="stat-card stat-orange">
+      <div class="stat-label">AZV-Tage</div>
+      <div class="stat-value">12 Tage</div>
+      <div class="stat-sub">Verbraucht: 0</div>
+    </div>
+    <div class="stat-card stat-red">
+      <div class="stat-label">Steuerklasse</div>
+      <div class="stat-value">III</div>
+      <div class="stat-sub">KiSt: 9%</div>
+    </div>
+    <div class="stat-card stat-blue">
+      <div class="stat-label">Abzüge (Dez)</div>
+      <div class="stat-value">822 €</div>
+      <div class="stat-sub">Steuern + SV</div>
+    </div>
   </div>
-</div>
 
-<div class="card">
-  <div class="card-title"><div class="dot dot-green"></div>Zuschlagssätze laut Tarifvertrag</div>
-  <div class="alert alert-info" style="margin-bottom:1rem; font-size:0.75rem;">
-    📄 Direkt aus dem ETV-Dokument (Stand 05/2024) übernommen. Nur bei abweichendem TV anpassen.
-  </div>
-  <div class="grid-2" style="gap:0.8rem;">
-    <div class="field"><label>🌙 Nacht 20–05h (%)</label><input type="number" id="z_nacht" value="50"></div>
-    <div class="field"><label>⏱ Mehrarbeit (%)</label><input type="number" id="z_mehr" value="25"></div>
-    <div class="field"><label>☀️ Sonntag (%)</label><input type="number" id="z_so" value="50"></div>
-    <div class="field"><label>🟡 Samstag bis 13h (%)</label><input type="number" id="z_sa1" value="15"></div>
-    <div class="field"><label>🟠 Samstag ab 13h (%)</label><input type="number" id="z_sa2" value="50"></div>
-    <div class="field"><label>🔴 Feiertag Mo–Sa (%)</label><input type="number" id="z_ft_woche" value="175"></div>
-    <div class="field"><label>🔴 Feiertag Sonntag (%)</label><input type="number" id="z_ft_so" value="75"></div>
-    <div class="field"><label>Mehrarbeit ab (h/Woche)</label><input type="number" id="mehr_ab" value="40"></div>
-  </div>
-  <div class="sep"></div>
-  <div class="tip" style="margin-bottom:1rem;">Nachtzeit tariflich: 20:00–05:00 Uhr</div>
-</div>
-```
-
-  </div>
-
-  <!-- Zeile 2: Persönliche Daten + Netto-Vorschau -->
-
-  <div class="grid-2">
+  <div class="two-col">
     <div class="card">
-      <div class="card-title"><div class="dot dot-purple"></div>Persönliche Daten &amp; Steuer</div>
-
-```
-  <div class="grid-2" style="gap:0.8rem;">
-    <div class="field"><label>Vorname</label><input type="text" id="vorname" placeholder="Max"></div>
-    <div class="field"><label>Nachname</label><input type="text" id="nachname" placeholder="Mustermann"></div>
-  </div>
-
-  <div class="sep"></div>
-  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.8rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;">Steuer</div>
-
-  <div class="grid-2" style="gap:0.8rem;">
-    <div class="field">
-      <label>Steuerklasse</label>
-      <select id="steuerklasse" onchange="berechneNettoVorschau()">
-        <option value="1">Klasse 1 — Ledig</option>
-        <option value="2">Klasse 2 — Alleinerziehend</option>
-        <option value="3">Klasse 3 — Verheiratet (höheres Eink.)</option>
-        <option value="4">Klasse 4 — Verheiratet (gleiches Eink.)</option>
-        <option value="5">Klasse 5 — Verheiratet (niedrigeres Eink.)</option>
-        <option value="6">Klasse 6 — Zweitjob</option>
-      </select>
+      <div class="card-title">🗓️ Übersicht Arbeitstage 2024</div>
+      <div id="jahresuebersicht-chart"></div>
+      <table>
+        <thead><tr>
+          <th>Monat</th>
+          <th>Arbeitstage</th>
+          <th>Urlaub</th>
+          <th>Krank</th>
+          <th>Feiertage</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody id="jahres-tbody"></tbody>
+      </table>
     </div>
-    <div class="field">
-      <label>Kinderfreibetrag (Anzahl Kinder)</label>
-      <input type="number" id="kinder" value="0" min="0" step="0.5" onchange="berechneNettoVorschau()" placeholder="0">
-    </div>
-  </div>
 
-  <div class="field">
-    <label>Bundesland (für Kirchensteuer & PV)</label>
-    <select id="bundesland" onchange="berechneNettoVorschau()">
-      <option value="BW">Baden-Württemberg</option>
-      <option value="BY">Bayern</option>
-      <option value="BE">Berlin</option>
-      <option value="BB">Brandenburg</option>
-      <option value="HB">Bremen</option>
-      <option value="HH">Hamburg</option>
-      <option value="HE">Hessen</option>
-      <option value="MV">Mecklenburg-Vorpommern</option>
-      <option value="NI">Niedersachsen</option>
-      <option value="NW" selected>Nordrhein-Westfalen</option>
-      <option value="RP">Rheinland-Pfalz</option>
-      <option value="SL">Saarland</option>
-      <option value="SN">Sachsen</option>
-      <option value="ST">Sachsen-Anhalt</option>
-      <option value="SH">Schleswig-Holstein</option>
-      <option value="TH">Thüringen</option>
-    </select>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
-    <input type="checkbox" id="kirchensteuer" onchange="berechneNettoVorschau()">
-    <label style="margin-bottom:0;cursor:pointer;font-size:0.8rem;text-transform:none;letter-spacing:0;" for="kirchensteuer">
-      ✝️ Kirchensteuerpflichtig (8–9% der Lohnsteuer)
-    </label>
-  </div>
-
-  <div class="sep"></div>
-  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.8rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;">Kranken- &amp; Pflegeversicherung</div>
-
-  <div class="field">
-    <label>Krankenversicherung</label>
-    <select id="kvTyp" onchange="berechneNettoVorschau()">
-      <option value="gesetzlich">Gesetzlich (GKV)</option>
-      <option value="privat">Privat (PKV) — nur AN-Anteil relevant</option>
-    </select>
-  </div>
-  <div class="field">
-    <label>GKV Zusatzbeitrag deiner Kasse (%)</label>
-    <input type="number" id="kvZusatz" value="1.7" step="0.1" min="0" max="5" onchange="berechneNettoVorschau()" placeholder="z.B. 1.7">
-  </div>
-  <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
-    <input type="checkbox" id="pvKinder" onchange="berechneNettoVorschau()">
-    <label style="margin-bottom:0;cursor:pointer;font-size:0.8rem;text-transform:none;letter-spacing:0;" for="pvKinder">
-      👶 Kinder vorhanden (kein PV-Zuschlag)
-    </label>
-  </div>
-
-  <div class="tip">
-    💡 Alle Abgaben basieren auf den gesetzlichen Sätzen 2025. Die Netto-Schätzung ist ein Näherungswert — für exakte Zahlen gilt deine Lohnabrechnung.
-  </div>
-</div>
-
-<!-- Netto-Vorschau Card -->
-<div>
-  <div class="card" id="netto-vorschau-card">
-    <div class="card-title"><div class="dot dot-green"></div>Netto-Schätzung (monatlich)</div>
-    <div id="netto-vorschau-inhalt">
-      <div style="text-align:center;padding:2rem;color:var(--muted);">
-        <div style="font-size:2rem;margin-bottom:0.5rem;">🧮</div>
-        Einstellungen speichern für Berechnung.
-      </div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:1.2rem;">
-    <div class="card-title"><div class="dot dot-blue"></div>Abgaben-Info 2025</div>
-    <div class="row"><span class="row-label">Rentenversicherung AN</span><span>9,3%</span></div>
-    <div class="row"><span class="row-label">Arbeitslosenversicherung AN</span><span>1,3%</span></div>
-    <div class="row"><span class="row-label">GKV Basisbeitrag AN</span><span>7,3%</span></div>
-    <div class="row"><span class="row-label">GKV Zusatzbeitrag AN (½)</span><span>variabel</span></div>
-    <div class="row"><span class="row-label">Pflegeversicherung AN (ohne Kinder)</span><span>2,4%</span></div>
-    <div class="row"><span class="row-label">Pflegeversicherung AN (mit Kindern)</span><span>1,7%</span></div>
-    <div class="row" style="border:none;"><span class="row-label">Kirchensteuer (NRW/BY etc.)</span><span>8–9% d. LSt</span></div>
-  </div>
-</div>
-```
-
-  </div>
-
-  <div style="margin-top:1.5rem;">
-    <button class="btn btn-primary" style="width:100%;padding:1rem;" onclick="speichern()">💾 Alle Einstellungen speichern</button>
-  </div>
-</div>
-
-<!-- ══════════ ROTATION ══════════ -->
-
-<div id="tab-rotation" class="section-hidden container">
-  <div class="grid-2">
-    <div>
-      <div class="card">
-        <div class="card-title"><div class="dot"></div>Rotationsstart</div>
-        <div class="field">
-          <label>Montag der Woche 1 (Rotationsstart)</label>
-          <input type="date" id="rotStart" onchange="renderRotation()">
-        </div>
-        <div class="tip">💡 Gib den Montag ein, an dem deine Rotation in Woche 1 beginnt. Die App berechnet automatisch alle 5 Wochen.</div>
-        <div class="sep"></div>
-        <div class="card-title" style="margin-bottom:0.6rem;"><div class="dot dot-blue"></div>Legende</div>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;font-size:0.72rem;">
-          <span class="badge badge-early">🌅 Frühschicht 06–13h</span>
-          <span class="badge badge-late">🌆 Spätschicht 13–20h</span>
-          <span class="badge badge-night">🌙 Nachtschicht 20–06h</span>
-          <span class="badge badge-free">🛌 Frei / ZBV</span>
-        </div>
-        <button class="btn btn-primary" style="margin-top:1.2rem;width:100%;" onclick="importiereRotation()">
-          📥 Alle Schichten automatisch eintragen
-        </button>
-        <div class="tip" style="margin-top:0.6rem;">Trägt alle Arbeitsschichten der 5-Wochen-Rotation automatisch ein. Feiertage danach bitte manuell markieren.</div>
-      </div>
-
-```
-  <div class="card" style="margin-top:1.2rem;">
-    <div class="card-title"><div class="dot dot-purple"></div>Dein Schichtmodell (fix)</div>
-    <div id="rotation-schema"></div>
-  </div>
-</div>
-<div class="card">
-  <div class="card-title"><div class="dot dot-green"></div>Nächste 5 Wochen im Detail</div>
-  <div id="rotation-kalender"></div>
-</div>
-```
-
-  </div>
-</div>
-
-<!-- ══════════ SCHICHTEN ══════════ -->
-
-<div id="tab-schichten" class="section-hidden container">
-  <div class="grid-2">
     <div class="card">
-      <div class="card-title"><div class="dot"></div>Schicht erfassen</div>
-      <div class="grid-2" style="gap:0.8rem;">
-        <div class="field"><label>Datum</label><input type="date" id="sDatum"></div>
-        <div class="field">
-          <label>Schichtart</label>
-          <select id="sArt" onchange="schichtArtWaehlen()">
-            <option value="frueh">🌅 Frühschicht (06–13h)</option>
-            <option value="spaet">🌆 Spätschicht (13–20h)</option>
-            <option value="nacht">🌙 Nachtschicht (20–06h)</option>
-            <option value="custom">✏️ Eigene Zeiten</option>
-          </select>
-        </div>
-        <div class="field"><label>Von</label><input type="time" id="sVon" value="06:00"></div>
-        <div class="field"><label>Bis</label><input type="time" id="sBis" value="13:00"></div>
+      <div class="card-title">💰 Entgeltübersicht 2024</div>
+      <table>
+        <thead><tr>
+          <th>Monat</th>
+          <th class="text-right">Brutto</th>
+          <th class="text-right">Abzüge</th>
+          <th class="text-right">Netto</th>
+        </tr></thead>
+        <tbody id="entgelt-tbody"></tbody>
+      </table>
+      <hr class="section-divider">
+      <div class="detail-row">
+        <span class="detail-key">Jahres-Brutto (Dez)</span>
+        <span class="mono text-blue">3.500,00 €</span>
       </div>
-      <div class="field"><label>Pause (Minuten)</label><input type="number" id="sPause" value="30"></div>
-      <div class="field" style="display:flex;align-items:center;gap:0.6rem;">
-        <input type="checkbox" id="sFeiertag">
-        <label style="margin-bottom:0;cursor:pointer;" for="sFeiertag">Gesetzlicher Feiertag 🎉</label>
+      <div class="detail-row">
+        <span class="detail-key">Jahres-Abzüge (Dez)</span>
+        <span class="mono text-red">822,81 €</span>
       </div>
-      <div class="field"><label>Notiz</label><input type="text" id="sNotiz" placeholder="Optional..."></div>
-
-```
-  <div id="vorschau" style="display:none;margin:1rem 0;">
-    <div class="card" style="background:var(--surface2);padding:1rem;">
-      <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.5rem;letter-spacing:0.08em;">VORSCHAU</div>
-      <div id="vorschau-inhalt"></div>
+      <div class="detail-row">
+        <span class="detail-key">Jahres-Netto (Dez)</span>
+        <span class="mono text-green">2.677,19 €</span>
+      </div>
     </div>
   </div>
-  <div class="btn-group">
-    <button class="btn btn-secondary" onclick="zeigeVorschau()">👁 Vorschau</button>
-    <button class="btn btn-primary" onclick="hinzufuegen()">+ Hinzufügen</button>
-  </div>
-</div>
 
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-    <div class="card-title" style="margin-bottom:0;"><div class="dot"></div>Erfasste Schichten</div>
-    <button class="btn btn-sm btn-danger" onclick="alleWeg()">🗑 Alle löschen</button>
-  </div>
-  <div id="schicht-liste"></div>
-</div>
-```
-
-  </div>
-</div>
-
-<!-- ══════════ AUSWERTUNG ══════════ -->
-
-<div id="tab-auswertung" class="section-hidden container">
-  <div class="grid-4" id="stat-row" style="margin-bottom:1.5rem;"></div>
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title"><div class="dot"></div>Zuschläge aufgeschlüsselt</div>
-      <div id="aufschluss"></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><div class="dot dot-blue"></div>Schichtstatistik</div>
-      <div id="statistik"></div>
+  <div class="card">
+    <div class="card-title">📋 Aktuelle Abrechnungsperiode – Dezember 2024</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Lohnsteuer</div>
+        <div class="stat-value mono" style="font-size:16px">239,50 €</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rentenversicherung</div>
+        <div class="stat-value mono" style="font-size:16px">325,50 €</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Krankenversicherung</div>
+        <div class="stat-value mono" style="font-size:16px">140,88 €</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pflegeversicherung</div>
+        <div class="stat-value mono" style="font-size:16px">53,38 €</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Arbeitslosenvers.</div>
+        <div class="stat-value mono" style="font-size:16px">42,00 €</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Kirchensteuer</div>
+        <div class="stat-value mono" style="font-size:16px">21,55 €</div>
+      </div>
     </div>
   </div>
-  <div class="card" style="margin-top:1.2rem;">
-    <div class="card-title"><div class="dot dot-green"></div>Einzelübersicht aller Schichten</div>
+
+</div>
+
+<!-- ═══════════════════ ZEITERFASSUNG ═══════════════════ -->
+<div id="section-zeiterfassung" class="section">
+
+  <div class="month-tabs" id="time-month-tabs"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Urlaub</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Krank</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> Feiertag</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4f6ef7"></div> Arbeitstag</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2a2a3a"></div> Wochenende</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="cal-title">📅 September 2024</div>
+    <div class="calendar-grid" id="calendar-grid">
+      <div class="cal-header">Mo</div>
+      <div class="cal-header">Di</div>
+      <div class="cal-header">Mi</div>
+      <div class="cal-header">Do</div>
+      <div class="cal-header">Fr</div>
+      <div class="cal-header">Sa</div>
+      <div class="cal-header">So</div>
+    </div>
+  </div>
+
+  <div class="card" id="month-stats-card">
+    <div class="card-title">📊 Monatsstatistik</div>
+    <div class="stats-grid" id="month-stats"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Tagesliste</div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Datum</th><th>Art</th><th>Von–Bis</th><th>Netto h</th>
-            <th>Grundlohn</th><th>Nacht</th><th>Sa/So</th><th>Feiertag</th><th>Mehrarbeit</th><th>Brutto</th>
-          </tr>
-        </thead>
-        <tbody id="detail-table"></tbody>
+        <thead><tr>
+          <th>Tag</th>
+          <th>Wochentag</th>
+          <th>Typ</th>
+          <th>Kommt</th>
+          <th>Geht</th>
+          <th>Pause</th>
+          <th>Netto-Std</th>
+          <th>Bemerkung</th>
+        </tr></thead>
+        <tbody id="days-tbody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ══════════ LOHNCHECK ══════════ -->
+<!-- ═══════════════════ ENTGELT ═══════════════════ -->
+<div id="section-entgelt" class="section">
 
-<div id="tab-check" class="section-hidden container">
-  <div class="grid-2">
+  <div class="month-tabs" id="entgelt-month-tabs"></div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title" id="entgelt-title">💰 Entgeltabrechnung September 2024</div>
+      <div class="detail-panel">
+        <h4>Basisbezüge</h4>
+        <div id="entgelt-basis"></div>
+      </div>
+      <div class="detail-panel">
+        <h4>Zeitbezüge</h4>
+        <div id="entgelt-zeit"></div>
+      </div>
+      <div class="detail-panel">
+        <h4>Abzüge</h4>
+        <div id="entgelt-abzuege"></div>
+      </div>
+      <div class="detail-panel">
+        <h4>Zahlungen</h4>
+        <div id="entgelt-zahlungen"></div>
+      </div>
+    </div>
+
     <div>
       <div class="card">
-        <div class="card-title"><div class="dot"></div>Lohnabrechnung prüfen</div>
-        <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">Gib die Werte von deiner Abrechnung ein. Der LohnCheck vergleicht sie mit deinen erfassten Schichten.</p>
-        <div class="field"><label>Monat (Abrechnungszeitraum)</label><input type="month" id="ck_monat"></div>
-        <div class="field"><label>Brutto-Lohn laut Abrechnung (€)</label><input type="number" id="ck_brutto" step="0.01" placeholder="z.B. 2450.00"></div>
-        <div class="field"><label>Grundlohn laut Abrechnung (€)</label><input type="number" id="ck_grund" step="0.01" placeholder="z.B. 2100.00"></div>
-        <div class="field"><label>Stunden laut Abrechnung (h)</label><input type="number" id="ck_stunden" step="0.5" placeholder="z.B. 168"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:0.5rem;" onclick="lohnCheck()">🔍 Jetzt prüfen</button>
+        <div class="card-title">📋 Urlaubsdaten</div>
+        <table>
+          <thead><tr><th>Art</th><th>Zeitraum</th><th>Anspruch</th><th>Abgetragen</th><th>Rest</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Tarifurlaub</td>
+              <td class="text-muted">1.01.–31.12.2024</td>
+              <td class="text-blue">34</td>
+              <td>0</td>
+              <td class="text-green">34</td>
+            </tr>
+            <tr>
+              <td>Zusatzurlaub</td>
+              <td class="text-muted">1.01.–31.12.2024</td>
+              <td class="text-blue">4</td>
+              <td>—</td>
+              <td class="text-green">4</td>
+            </tr>
+            <tr>
+              <td>AZV-Tage</td>
+              <td class="text-muted">1.01.–31.12.2024</td>
+              <td class="text-blue">12</td>
+              <td>0</td>
+              <td class="text-green">12</td>
+            </tr>
+            <tr>
+              <td>Umkleidekontingent</td>
+              <td class="text-muted">1.01.–31.12.2023</td>
+              <td class="text-blue">12</td>
+              <td>0</td>
+              <td class="text-green">12</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-```
-  <div class="card" style="margin-top:1.2rem;">
-    <div class="card-title"><div class="dot dot-blue"></div>Rechtliche Infos</div>
-    <div class="row"><span class="row-label">§3b EStG: Nacht steuerfrei bis</span><span class="green">25%</span></div>
-    <div class="row"><span class="row-label">§3b EStG: Sonntag steuerfrei bis</span><span class="green">50%</span></div>
-    <div class="row"><span class="row-label">§3b EStG: Feiertag steuerfrei bis</span><span class="green">125%</span></div>
-    <div class="row"><span class="row-label">Mindestlohn 2025</span><span class="accent">12,82 €/h</span></div>
-    <div class="row"><span class="row-label">Stundenkonto-Grenze (BV)</span><span class="blue">200 h</span></div>
-    <div class="row" style="border:none;"><span class="row-label">Betriebsrat Edewecht</span><span class="blue">04405/188-43144</span></div>
-    <div class="tip" style="margin-top:0.8rem;">TV-Zuschläge können die steuerfreien Grenzen übersteigen. Nur der Teil bis zur §3b-Grenze ist steuerfrei.</div>
+      <div class="card">
+        <div class="card-title">🏛️ Kostenstelleninfo</div>
+        <div class="detail-panel">
+          <div class="detail-row"><span class="detail-key">Abt.</span><span>AWSF</span></div>
+          <div class="detail-row"><span class="detail-key">Kostenstelle</span><span class="mono">0</span></div>
+          <div class="detail-row"><span class="detail-key">Personalnr.</span><span class="mono">0</span></div>
+          <div class="detail-row"><span class="detail-key">Zeitraum</span><span id="ent-zeitraum"></span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div id="check-ergebnis">
+<!-- ═══════════════════ URLAUB ═══════════════════ -->
+<div id="section-urlaub" class="section">
+
   <div class="card">
-    <div style="text-align:center;padding:3rem;color:var(--muted);">
-      <div style="font-size:2.5rem;margin-bottom:0.8rem;">🔍</div>
-      <div>Gib deine Abrechnungsdaten ein und starte den Check.</div>
+    <div class="card-title">🏖️ Urlaubskonto 2024</div>
+    <div class="stats-grid">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Tarifurlaub Anspruch</div>
+        <div class="stat-value">34</div>
+        <div class="stat-sub">Tage im Jahr</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-label">Tarifurlaub Rest</div>
+        <div class="stat-value">34</div>
+        <div class="stat-sub">Noch verfügbar</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Zusatzurlaub</div>
+        <div class="stat-value">4</div>
+        <div class="stat-sub">Tage</div>
+      </div>
+      <div class="stat-card stat-yellow">
+        <div class="stat-label">AZV-Tage</div>
+        <div class="stat-value">12</div>
+        <div class="stat-sub">Verfügbar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 Abwesenheitsübersicht nach Monat</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Monat</th>
+          <th>Urlaubstage</th>
+          <th>Krankheitstage</th>
+          <th>Feiertage</th>
+          <th>AZV-Tage</th>
+          <th>Sonderurlaub</th>
+        </tr></thead>
+        <tbody id="abwesenheit-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">➕ Abwesenheit erfassen</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Monat</label>
+        <select id="ab-monat">
+          <option value="9">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Dezember</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tag (1–31)</label>
+        <input type="number" id="ab-tag" min="1" max="31" value="1">
+      </div>
+      <div class="form-group">
+        <label>Art</label>
+        <select id="ab-art">
+          <option value="U">Urlaub (U)</option>
+          <option value="K">Krank (K)</option>
+          <option value="F">Feiertag (F)</option>
+          <option value="AZV">AZV-Tag</option>
+          <option value="SU">Sonderurlaub</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="addAbwesenheit()">Eintragen</button>
+      <button class="btn btn-secondary" onclick="clearAbwesenheit()">Zurücksetzen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ STEUER ═══════════════════ -->
+<div id="section-steuer" class="section">
+
+  <div class="card">
+    <div class="card-title">🏛️ Lohnsteuerberechnung 2024</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Steuerpflichtiger Arbeitslohn (€)</label>
+        <input type="number" id="steuer-lohn" value="3500" step="50">
+      </div>
+      <div class="form-group">
+        <label>Steuerklasse</label>
+        <select id="steuer-klasse">
+          <option>1</option><option>2</option><option selected>3</option>
+          <option>4</option><option>5</option><option>6</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kirchensteuer (%)</label>
+        <select id="steuer-kirche">
+          <option value="0">Keine (0%)</option>
+          <option value="8">8%</option>
+          <option value="9" selected>9%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>KV-Beitragssatz (Arbeitnehmer-Anteil, %)</label>
+        <input type="number" id="steuer-kv" value="8.05" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Zahlungszeitraum</label>
+        <select id="steuer-lzz">
+          <option value="1">Jährlich</option>
+          <option value="2" selected>Monatlich</option>
+          <option value="3">Wöchentlich</option>
+          <option value="4">Täglich</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Kinderfreibetrag</label>
+        <input type="number" id="steuer-kfb" value="0" step="0.5">
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primary" onclick="berechneSteuern()">Berechnen</button>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">📊 Berechnungsergebnis</div>
+      <div id="steuer-ergebnis">
+        <div class="detail-panel">
+          <div class="detail-row"><span class="detail-key">Bruttolohn</span><span class="mono text-blue" id="res-brutto">3.500,00 €</span></div>
+          <div class="detail-row"><span class="detail-key">Lohnsteuer</span><span class="mono text-red" id="res-lst">239,50 €</span></div>
+          <div class="detail-row"><span class="detail-key">Solidaritätszuschlag</span><span class="mono text-red" id="res-solz">0,00 €</span></div>
+          <div class="detail-row"><span class="detail-key">Kirchensteuer (9%)</span><span class="mono text-red" id="res-kist">21,55 €</span></div>
+          <div class="detail-row"><span class="detail-key">Rentenversicherung (9,3%)</span><span class="mono text-red" id="res-rv">325,50 €</span></div>
+          <div class="detail-row"><span class="detail-key">Krankenversicherung (4,025%)</span><span class="mono text-red" id="res-kv">140,88 €</span></div>
+          <div class="detail-row"><span class="detail-key">Pflegeversicherung (1,525%)</span><span class="mono text-red" id="res-pv">53,38 €</span></div>
+          <div class="detail-row"><span class="detail-key">Arbeitslosenversicherung (1,2%)</span><span class="mono text-red" id="res-av">42,00 €</span></div>
+          <hr class="section-divider">
+          <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamt Abzüge</span><span class="mono text-red" id="res-gesamt">822,81 €</span></div>
+          <div class="detail-row" style="font-size:16px;padding:12px 0"><span class="detail-key" style="font-weight:700">Nettolohn</span><span class="mono text-green" id="res-netto" style="font-size:20px;font-weight:700">2.677,19 €</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 Abzugsquote</div>
+      <div id="abzug-vis">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Netto</span><span id="pct-netto">76,5%</span></div>
+          <div class="progress-bar" style="height:14px">
+            <div class="progress-fill" id="bar-netto" style="width:76.5%;background:var(--green)"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Steuern</span><span id="pct-steuern">7,5%</span></div>
+          <div class="progress-bar" style="height:14px">
+            <div class="progress-fill" id="bar-steuern" style="width:7.5%;background:var(--red)"></div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Sozialversicherung</span><span id="pct-sv">16%</span></div>
+          <div class="progress-bar" style="height:14px">
+            <div class="progress-fill" id="bar-sv" style="width:16%;background:var(--accent)"></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="card-title">📋 Arbeitgeberbeiträge (Schätzung)</div>
+      <div class="detail-panel">
+        <div class="detail-row"><span class="detail-key">RV AG (9,3%)</span><span class="mono" id="ag-rv">325,50 €</span></div>
+        <div class="detail-row"><span class="detail-key">KV AG (~7,65%)</span><span class="mono" id="ag-kv">267,75 €</span></div>
+        <div class="detail-row"><span class="detail-key">PV AG (1,525%)</span><span class="mono" id="ag-pv">53,38 €</span></div>
+        <div class="detail-row"><span class="detail-key">AV AG (1,2%)</span><span class="mono" id="ag-av">42,00 €</span></div>
+        <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamt AG-Beiträge</span><span class="mono text-yellow" id="ag-gesamt">688,63 €</span></div>
+        <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamtkosten AG</span><span class="mono text-orange" id="ag-total">4.188,63 €</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ EINTRAGEN ═══════════════════ -->
+<div id="section-eintragen" class="section">
+  <div class="card">
+    <div class="card-title">⏱️ Arbeitszeit eintragen</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Monat</label>
+        <select id="et-monat">
+          <option value="9">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Dezember</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tag</label>
+        <input type="number" id="et-tag" min="1" max="31" value="1">
+      </div>
+      <div class="form-group">
+        <label>Kommt (Uhr)</label>
+        <input type="time" id="et-kommt" value="07:00">
+      </div>
+      <div class="form-group">
+        <label>Geht (Uhr)</label>
+        <input type="time" id="et-geht" value="15:30">
+      </div>
+      <div class="form-group">
+        <label>Pause (Minuten)</label>
+        <input type="number" id="et-pause" value="30" min="0">
+      </div>
+      <div class="form-group">
+        <label>Typ</label>
+        <select id="et-typ">
+          <option value="A">Arbeitstag</option>
+          <option value="U">Urlaub</option>
+          <option value="K">Krank</option>
+          <option value="F">Feiertag</option>
+          <option value="AZV">AZV-Tag</option>
+          <option value="SU">Sonderurlaub</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Kostenstelle (optional)</label>
+        <input type="text" id="et-kst" placeholder="z.B. 2221">
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="addTimeEntry()">Eintragen</button>
+      <button class="btn btn-secondary" onclick="clearTimeForm()">Leeren</button>
+    </div>
+    <div id="et-feedback" style="margin-top:12px;font-size:13px;color:var(--green);display:none"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Manuell erfasste Einträge</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Monat</th><th>Tag</th><th>Wochentag</th><th>Typ</th>
+          <th>Kommt</th><th>Geht</th><th>Pause</th><th>Netto-Std</th><th>Kostenstelle</th><th>Aktion</th>
+        </tr></thead>
+        <tbody id="manual-tbody">
+          <tr><td colspan="10" class="text-muted" style="text-align:center;padding:20px">Noch keine manuellen Einträge</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 ```
 
-  </div>
+  </main>
 </div>
 
 <script>
-// ── TARIF ──────────────────────────────────────────────────────────
-const LOHNGRUPPEN = [
-  {gr:1,  std:16.84},{gr:2,  std:18.66},{gr:3,  std:19.77},{gr:4,  std:20.45},{gr:5,  std:21.37},
-  {gr:6,  std:22.82},{gr:7,  std:24.67},{gr:'7a',std:27.16},{gr:8,  std:29.65},{gr:9,  std:32.44},{gr:10, std:35.23}
-];
+// ═══════════════════ DATA ═══════════════════
 
-// Rotation: [Woche][Tag 0=Mo..6=So] = 'frueh'|'spaet'|'nacht'|'frei'
-const ROTATION = [
-  ['frueh','frueh','spaet','spaet','nacht','nacht','nacht'],  // W1
-  ['frei', 'frei', 'frueh','frueh','spaet','spaet','spaet'],  // W2
-  ['nacht','nacht','frei', 'frei', 'frueh','frueh','frueh'],  // W3
-  ['spaet','spaet','nacht','nacht','frei', 'frei', 'frei' ],  // W4
-  ['frei', 'frei', 'frei', 'frei', 'frei', 'frei', 'frei' ],  // W5 ZBV
-];
-const TAGNAME = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-
-// ── STATE ──────────────────────────────────────────────────────────
-let einst = JSON.parse(localStorage.getItem('dmk_einst') || 'null') || {
-  stundenLohn:18.66, lohngruppe:'2',
-  fruehVon:'06:00',fruehBis:'13:00',spaetVon:'13:00',spaetBis:'20:00',nachtVon:'20:00',nachtBis:'06:00',
-  pauseMin:30,
-  z_nacht:50,z_mehr:25,z_so:50,z_sa1:15,z_sa2:50,z_ft_woche:175,z_ft_so:75,mehr_ab:40,
-  // Persönliche Daten
-  vorname:'', nachname:'', steuerklasse:1, kinder:0, kirchensteuer:false,
-  kvTyp:'gesetzlich', kvZusatz:1.7, pvKinder:false, bundesland:'NW'
+const MONTHS = {
+  9:  { name: 'September', days: 30, start: 0 }, // 0=Mo
+  10: { name: 'Oktober',   days: 31, start: 1 }, // 1=Di
+  11: { name: 'November',  days: 4 }, // starts Fr
+  12: { name: 'Dezember',  days: 31, start: 6 }, // starts So
 };
-let schichten = JSON.parse(localStorage.getItem('dmk_schichten') || '[]');
 
-// ── INIT ───────────────────────────────────────────────────────────
+// Real day data extracted from the Excel
+const dayData = {
+  9: {
+    // day: { typ, kommt, geht, special }
+    // From September sheet analysis
+    1: { typ: 'So', badge: 'F', special: 'Sonntag', frei: true },
+    2: { typ: 'Mo', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
+    3: { typ: 'Di', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
+    4: { typ: 'Mi', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
+    5: { typ: 'Do', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
+    6: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    7: { typ: 'Sa', badge: '37F', sa: true },
+    8: { typ: 'So', badge: '6F', so: true },
+    9: { typ: 'Mo', badge: 'F' },
+    10: { typ: 'Di', badge: 'F' },
+    11: { typ: 'Mi', badge: 'F' },
+    12: { typ: 'Do', badge: 'F' },
+    13: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    14: { typ: 'Sa', badge: '37F', sa: true },
+    15: { typ: 'So', badge: '6F', so: true },
+    16: { typ: 'Mo', badge: 'F' },
+    17: { typ: 'Di', badge: 'F' },
+    18: { typ: 'Mi', badge: 'F' },
+    19: { typ: 'Do', badge: 'F' },
+    20: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    21: { typ: 'Sa', badge: '37F', sa: true },
+    22: { typ: 'So', badge: '6F', so: true },
+    23: { typ: 'Mo', badge: 'F' },
+    24: { typ: 'Di', badge: 'F' },
+    25: { typ: 'Mi', badge: 'F' },
+    26: { typ: 'Do', badge: 'F' },
+    27: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    28: { typ: 'Sa', badge: '37F', sa: true },
+    29: { typ: 'So', badge: '6F', so: true },
+    30: { typ: 'Mo', badge: 'F' },
+  },
+  10: {
+    1: { typ: 'Di', badge: 'F' },
+    2: { typ: 'Mi', badge: '2F', urlaub: 2 },
+    3: { typ: 'Do', badge: '1F', feiertag: true, note: 'Tag der Deutschen Einheit', kommt: '00:00', geht: '08:00' },
+    4: { typ: 'Fr', badge: '4DF', urlaub: 4, note: 'D=Dienst?' },
+    5: { typ: 'Sa', badge: '37F', sa: true },
+    6: { typ: 'So', badge: '6F', so: true },
+    7: { typ: 'Mo', badge: 'F' },
+    8: { typ: 'Di', badge: 'F' },
+    9: { typ: 'Mi', badge: 'F' },
+    10: { typ: 'Do', badge: 'F' },
+    11: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    12: { typ: 'Sa', badge: '37F', sa: true },
+    13: { typ: 'So', badge: '6F', so: true },
+    14: { typ: 'Mo', badge: 'F' },
+    15: { typ: 'Di', badge: 'F' },
+    16: { typ: 'Mi', badge: 'F' },
+    17: { typ: 'Do', badge: 'F' },
+    18: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    19: { typ: 'Sa', badge: '37F', sa: true },
+    20: { typ: 'So', badge: '6F', so: true },
+    21: { typ: 'Mo', badge: 'F' },
+    22: { typ: 'Di', badge: 'F' },
+    23: { typ: 'Mi', badge: 'F' },
+    24: { typ: 'Do', badge: 'F' },
+    25: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    26: { typ: 'Sa', badge: '37F', sa: true },
+    27: { typ: 'So', badge: '6F', so: true },
+    28: { typ: 'Mo', badge: 'F' },
+    29: { typ: 'Di', badge: 'F' },
+    30: { typ: 'Mi', badge: 'F' },
+    31: { typ: 'Do', badge: 'F' },
+  },
+  11: {
+    1: { typ: 'Fr', badge: '4DF', urlaub: 4, note: 'Allerheiligen (Bayern)' },
+    2: { typ: 'Sa', badge: '37F', sa: true },
+    3: { typ: 'So', badge: '6F', so: true },
+    4: { typ: 'Mo', badge: 'F' },
+    5: { typ: 'Di', badge: 'F' },
+    6: { typ: 'Mi', badge: 'F' },
+    7: { typ: 'Do', badge: 'F' },
+    8: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    9: { typ: 'Sa', badge: '37F', sa: true },
+    10: { typ: 'So', badge: '6F', so: true },
+    11: { typ: 'Mo', badge: 'F' },
+    12: { typ: 'Di', badge: 'F' },
+    13: { typ: 'Mi', badge: 'F' },
+    14: { typ: 'Do', badge: 'F' },
+    15: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    16: { typ: 'Sa', badge: '37F', sa: true },
+    17: { typ: 'So', badge: '6F', so: true },
+    18: { typ: 'Mo', badge: 'F' },
+    19: { typ: 'Di', badge: 'F' },
+    20: { typ: 'Mi', badge: 'F' },
+    21: { typ: 'Do', badge: 'F' },
+    22: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    23: { typ: 'Sa', badge: '37F', sa: true },
+    24: { typ: 'So', badge: '6F', so: true },
+    25: { typ: 'Mo', badge: 'F' },
+    26: { typ: 'Di', badge: '4F', urlaub: 4 },
+    27: { typ: 'Mi', badge: '37F', sa: true },
+    28: { typ: 'Do', badge: '6F', so: true },
+    29: { typ: 'Fr', badge: 'F' },
+    30: { typ: 'Sa', badge: '37F', sa: true },
+  },
+  12: {
+    1: { typ: 'So', badge: '6F', so: true },
+    2: { typ: 'Mo', badge: 'F' },
+    3: { typ: 'Di', badge: 'F' },
+    4: { typ: 'Mi', badge: 'F' },
+    5: { typ: 'Do', badge: 'F' },
+    6: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    7: { typ: 'Sa', badge: '37F', sa: true },
+    8: { typ: 'So', badge: '6F', so: true },
+    9: { typ: 'Mo', badge: 'F' },
+    10: { typ: 'Di', badge: 'F' },
+    11: { typ: 'Mi', badge: 'F' },
+    12: { typ: 'Do', badge: 'F' },
+    13: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    14: { typ: 'Sa', badge: '37F', sa: true },
+    15: { typ: 'So', badge: '6F', so: true },
+    16: { typ: 'Mo', badge: 'F' },
+    17: { typ: 'Di', badge: 'F' },
+    18: { typ: 'Mi', badge: 'F' },
+    19: { typ: 'Do', badge: 'F' },
+    20: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    21: { typ: 'Sa', badge: '37F', sa: true },
+    22: { typ: 'So', badge: '6F', so: true },
+    23: { typ: 'Mo', badge: 'AF', note: 'AZV-Tag' },
+    24: { typ: 'Di', badge: '2AF', note: 'Heiligabend' },
+    25: { typ: 'Mi', badge: '12AF', feiertag: true, kommt: '00:00', geht: '08:00', note: '1. Weihnachtstag' },
+    26: { typ: 'Do', badge: 'F', feiertag: false },
+    27: { typ: 'Fr', badge: '4F', urlaub: 4 },
+    28: { typ: 'Sa', badge: '37F', sa: true },
+    29: { typ: 'So', badge: '6F', so: true },
+    30: { typ: 'Mo', badge: 'F' },
+    31: { typ: 'Di', badge: 'F' },
+  }
+};
+
+const entgeltData = {
+  9:  { monat: 'September 2024', zeitraum: '01.09. – 30.09.2024', brutto: 0, abzuege: 0, netto: 0 },
+  10: { monat: 'Oktober 2024',   zeitraum: '01.10. – 31.10.2024', brutto: 0, abzuege: 0, netto: 0 },
+  11: { monat: 'November 2024',  zeitraum: '01.11. – 30.11.2024', brutto: 0, abzuege: 0, netto: 0 },
+  12: { monat: 'Dezember 2024',  zeitraum: '01.12. – 31.12.2024', brutto: 3500, abzuege: 822.81, netto: 2677.19 },
+};
+
+const monthStartDays = { 9: 6, 10: 1, 11: 4, 12: 6 }; // 0=Mo…6=So
+
+let currentTimeMonth = 9;
+let currentEntgeltMonth = 12;
+let manualEntries = [];
+
+// ═══════════════════ INIT ═══════════════════
 function init() {
-  // LG Buttons
-  document.getElementById('lg-buttons').innerHTML = LOHNGRUPPEN.map(l =>
-    `<div class="lg-btn ${String(l.gr)===String(einst.lohngruppe)?'active':''}" onclick="waehleLG('${l.gr}',${l.std})">
-      <span class="lg-num">${l.gr}</span>
-      <span class="lg-lohn">${l.std.toFixed(2)}€</span>
-    </div>`
-  ).join('');
-
-  const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
-    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab',
-    'vorname','nachname','steuerklasse','kinder','kvZusatz','kvTyp','bundesland'];
-  felder.forEach(id => { const el=document.getElementById(id); if(el) el.value=einst[id]; });
-  if(document.getElementById('kirchensteuer')) document.getElementById('kirchensteuer').checked=einst.kirchensteuer;
-  if(document.getElementById('pvKinder')) document.getElementById('pvKinder').checked=einst.pvKinder;
-  berechneNettoVorschau();
-
-  const today = new Date().toISOString().split('T')[0];
-  if(document.getElementById('sDatum')) document.getElementById('sDatum').value = today;
-  if(document.getElementById('ck_monat')) document.getElementById('ck_monat').value = today.substring(0,7);
-
-  // Rotation Start = letzter Montag
-  const d = new Date(); const dow = d.getDay(); const diff = dow===0?6:dow-1;
-  d.setDate(d.getDate()-diff);
-  if(document.getElementById('rotStart')) document.getElementById('rotStart').value = d.toISOString().split('T')[0];
-
-  renderRotationSchema();
-  renderRotation();
-  renderSchichten();
-  updateAuswertung();
+  buildMonthTabs();
+  renderDashboard();
+  renderCalendar(currentTimeMonth);
+  renderEntgelt(currentEntgeltMonth);
+  renderAbwesenheit();
+  berechneSteuern();
 }
 
-function waehleLG(gr, std) {
-  document.querySelectorAll('.lg-btn').forEach(b=>b.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.getElementById('stundenLohn').value = std;
-  document.getElementById('lohngruppe').value = gr;
-}
+function buildMonthTabs() {
+  const months = [9,10,11,12];
+  const mNames = {9:'Sep',10:'Okt',11:'Nov',12:'Dez'};
 
-function speichern() {
-  const felder = ['stundenLohn','lohngruppe','fruehVon','fruehBis','spaetVon','spaetBis','nachtVon','nachtBis',
-    'pauseMin','z_nacht','z_mehr','z_so','z_sa1','z_sa2','z_ft_woche','z_ft_so','mehr_ab',
-    'vorname','nachname','steuerklasse','kinder','kvZusatz','kvTyp','bundesland'];
-  felder.forEach(id => {
-    const el=document.getElementById(id); if(!el) return;
-    if(el.type==='checkbox') einst[id]=el.checked;
-    else if(el.type==='text'||el.type==='time'||el.tagName==='SELECT') einst[id]=el.value;
-    else einst[id]=parseFloat(el.value)||0;
+  ['time-month-tabs','entgelt-month-tabs'].forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    months.forEach(m => {
+      const btn = document.createElement('button');
+      btn.className = 'month-tab has-data' + (
+        id === 'time-month-tabs' ? (m === currentTimeMonth ? ' active' : '') :
+        (m === currentEntgeltMonth ? ' active' : '')
+      );
+      btn.textContent = mNames[m];
+      btn.onclick = () => {
+        if (id === 'time-month-tabs') {
+          currentTimeMonth = m;
+          el.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderCalendar(m);
+        } else {
+          currentEntgeltMonth = m;
+          el.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderEntgelt(m);
+        }
+      };
+      el.appendChild(btn);
+    });
   });
-  einst.kirchensteuer = document.getElementById('kirchensteuer')?.checked||false;
-  einst.pvKinder      = document.getElementById('pvKinder')?.checked||false;
-  einst.steuerklasse  = parseInt(document.getElementById('steuerklasse')?.value||1);
-  einst.kinder        = parseFloat(document.getElementById('kinder')?.value||0);
-  localStorage.setItem('dmk_einst', JSON.stringify(einst));
-  schichten = schichten.map(s => ({...s, ...berechne(s.datum,s.von,s.bis,s.pause,s.feiertag)}));
-  localStorage.setItem('dmk_schichten', JSON.stringify(schichten));
-  updateAuswertung();
-  alert('✅ Gespeichert & alle Schichten neu berechnet!');
 }
 
-// ── BERECHNUNG ─────────────────────────────────────────────────────
-function berechne(datum, von, bis, pauseMin, istFeiertag) {
-  const [vh,vm]=von.split(':').map(Number), [bh,bm]=bis.split(':').map(Number);
-  let vonM=vh*60+vm, bisM=bh*60+bm;
-  if(bisM<=vonM) bisM+=1440;
-  const nettoMin=(bisM-vonM)-(parseInt(pauseMin)||0);
-  const nettoH=nettoMin/60;
-
-  const date=new Date(datum+'T12:00:00');
-  const tag=date.getDay(); // 0=So,6=Sa
-  const istSonntag=tag===0, istSamstag=tag===6;
-  const sl=einst.stundenLohn;
-
-  // Nacht: 20:00–05:00
-  let nachtH=0;
-  for(let m=vonM;m<bisM-(parseInt(pauseMin)||0);m++){
-    const mod=m%1440;
-    if(mod>=20*60||mod<5*60) nachtH+=1/60;
-  }
-
-  // Samstag bis/ab 13h
-  let sa1H=0,sa2H=0;
-  if(istSamstag&&!istFeiertag){
-    for(let m=vonM;m<bisM-(parseInt(pauseMin)||0);m++){
-      const mod=m%1440;
-      if(mod<13*60) sa1H+=1/60; else sa2H+=1/60;
-    }
-  }
-
-  const soH=(istSonntag&&!istFeiertag)?nettoH:0;
-  const ftH=istFeiertag?nettoH:0;
-
-  const grundlohn=nettoH*sl;
-  const zNacht=nachtH*sl*(einst.z_nacht/100);
-  const zSa1=sa1H*sl*(einst.z_sa1/100);
-  const zSa2=sa2H*sl*(einst.z_sa2/100);
-  const zSo=soH*sl*(einst.z_so/100);
-  const zFt=ftH*sl*((istSonntag?einst.z_ft_so:einst.z_ft_woche)/100);
-  const tagessoll=einst.mehr_ab/5;
-  const mehrH=Math.max(0,nettoH-tagessoll);
-  const zMehr=mehrH*sl*(einst.z_mehr/100);
-  const zuschlaege=zNacht+zSa1+zSa2+zSo+zFt+zMehr;
-  const brutto=grundlohn+zuschlaege;
-
-  return {nettoH,grundlohn,nachtH,sa1H,sa2H,soH,ftH,mehrH,zNacht,zSa1,zSa2,zSo,zFt,zMehr,zuschlaege,brutto,istSonntag,istSamstag,istFeiertag};
-}
-
-// ── ROTATION ───────────────────────────────────────────────────────
-function schichtBadge(art,small) {
-  const cls={frueh:'badge-early',spaet:'badge-late',nacht:'badge-night',frei:'badge-free'};
-  const lbl={frueh:'F',spaet:'S',nacht:'N',frei:'∅'};
-  const lblL={frueh:'Früh',spaet:'Spät',nacht:'Nacht',frei:'Frei'};
-  return `<span class="badge ${cls[art]||''}" style="font-size:${small?'0.58':'0.67'}rem;">${small?lbl[art]:lblL[art]}</span>`;
-}
-
-function renderRotationSchema() {
-  const div=document.getElementById('rotation-schema');
-  const wn=['Woche 1','Woche 2','Woche 3','Woche 4','Woche 5 (ZBV/Frei)'];
-  div.innerHTML=ROTATION.map((days,wi)=>`
-    <div class="rotation-block">
-      <div class="rotation-header"><span>${wn[wi]}</span></div>
-      <div class="rotation-days">
-        ${days.map((art,di)=>`<div class="rot-day"><div class="d">${TAGNAME[di]}</div>${schichtBadge(art,true)}</div>`).join('')}
-      </div>
-    </div>`).join('');
-}
-
-function renderRotation() {
-  const sv=document.getElementById('rotStart').value;
-  const div=document.getElementById('rotation-kalender');
-  if(!sv){div.innerHTML='<div style="color:var(--muted);font-size:0.8rem;">Bitte Datum wählen.</div>';return;}
-  const start=new Date(sv+'T12:00:00');
-  let html='';
-  for(let wi=0;wi<5;wi++){
-    const days=ROTATION[wi];
-    const w1=new Date(start);w1.setDate(start.getDate()+wi*7);
-    const w7=new Date(start);w7.setDate(start.getDate()+wi*7+6);
-    html+=`<div class="rotation-block">
-      <div class="rotation-header">
-        <span>${wi<4?'Woche '+(wi+1):'Woche 5 — ZBV/Frei'}</span>
-        <span style="color:var(--muted);font-size:0.65rem;">${fmtShort(w1)}–${fmtShort(w7)}</span>
-      </div>
-      <div class="rotation-days">
-        ${days.map((art,di)=>{
-          const d=new Date(start);d.setDate(start.getDate()+wi*7+di);
-          const isSo=d.getDay()===0,isSa=d.getDay()===6;
-          return `<div class="rot-day">
-            <div class="d">${TAGNAME[di]}</div>
-            <div style="font-size:0.63rem;color:var(--muted);margin-bottom:2px;">${d.getDate()}.${d.getMonth()+1}.</div>
-            ${schichtBadge(art,true)}
-            ${isSo&&art!=='frei'?'<div style="font-size:0.55rem;color:var(--accent2);margin-top:1px;">+So</div>':''}
-            ${isSa&&art!=='frei'?'<div style="font-size:0.55rem;color:var(--green);margin-top:1px;">+Sa</div>':''}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
-  div.innerHTML=html;
-}
-
-function importiereRotation() {
-  const sv=document.getElementById('rotStart').value;
-  if(!sv){alert('Bitte Startdatum wählen.');return;}
-  const start=new Date(sv+'T12:00:00');
-  const zeiten={frueh:{von:einst.fruehVon,bis:einst.fruehBis},spaet:{von:einst.spaetVon,bis:einst.spaetBis},nacht:{von:einst.nachtVon,bis:einst.nachtBis}};
-  let added=0;
-  for(let wi=0;wi<5;wi++){
-    for(let di=0;di<7;di++){
-      const art=ROTATION[wi][di];
-      if(art==='frei') continue;
-      const d=new Date(start);d.setDate(start.getDate()+wi*7+di);
-      const datum=d.toISOString().split('T')[0];
-      if(schichten.find(s=>s.datum===datum&&s.art===art)) continue;
-      const z=zeiten[art];
-      const r=berechne(datum,z.von,z.bis,einst.pauseMin,false);
-      schichten.push({id:Date.now()+Math.random(),datum,von:z.von,bis:z.bis,pause:einst.pauseMin,feiertag:false,art,notiz:'Auto',...r});
-      added++;
-    }
-  }
-  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
-  renderSchichten();updateAuswertung();
-  alert(`✅ ${added} Schichten eingetragen! Feiertage bitte manuell markieren.`);
-  showTab('schichten',document.querySelectorAll('.tab')[2]); document.querySelectorAll('.bnav-btn')[2].classList.add('active');
-}
-
-// ── SCHICHTEN ──────────────────────────────────────────────────────
-function schichtArtWaehlen(){
-  const art=document.getElementById('sArt').value;
-  const zeiten={frueh:[einst.fruehVon,einst.fruehBis],spaet:[einst.spaetVon,einst.spaetBis],nacht:[einst.nachtVon,einst.nachtBis]};
-  const isCustom=art==='custom';
-  document.getElementById('sVon').disabled=!isCustom;
-  document.getElementById('sBis').disabled=!isCustom;
-  if(!isCustom){const[v,b]=zeiten[art];document.getElementById('sVon').value=v;document.getElementById('sBis').value=b;}
-}
-
-function zeigeVorschau(){
-  const datum=document.getElementById('sDatum').value,von=document.getElementById('sVon').value,bis=document.getElementById('sBis').value;
-  const pause=document.getElementById('sPause').value,feiertag=document.getElementById('sFeiertag').checked;
-  if(!datum||!von||!bis){alert('Bitte Datum, Von und Bis angeben.');return;}
-  const r=berechne(datum,von,bis,pause,feiertag);
-  document.getElementById('vorschau').style.display='block';
-  document.getElementById('vorschau-inhalt').innerHTML=`
-    <div class="row"><span class="row-label">Nettostunden</span><span>${r.nettoH.toFixed(2)} h</span></div>
-    <div class="row"><span class="row-label">Grundlohn</span><span>${fmt(r.grundlohn)}</span></div>
-    <div class="row"><span class="row-label">🌙 Nacht (${r.nachtH.toFixed(2)}h × ${einst.z_nacht}%)</span><span class="green">+${fmt(r.zNacht)}</span></div>
-    <div class="row"><span class="row-label">🟡 Sa bis 13h (${r.sa1H.toFixed(2)}h × ${einst.z_sa1}%)</span><span class="green">+${fmt(r.zSa1)}</span></div>
-    <div class="row"><span class="row-label">🟠 Sa ab 13h (${r.sa2H.toFixed(2)}h × ${einst.z_sa2}%)</span><span class="green">+${fmt(r.zSa2)}</span></div>
-    <div class="row"><span class="row-label">☀️ Sonntag (${r.soH.toFixed(2)}h × ${einst.z_so}%)</span><span class="green">+${fmt(r.zSo)}</span></div>
-    <div class="row"><span class="row-label">🔴 Feiertag (${r.ftH.toFixed(2)}h)</span><span class="green">+${fmt(r.zFt)}</span></div>
-    <div class="row"><span class="row-label">⏱ Mehrarbeit (${r.mehrH.toFixed(2)}h × ${einst.z_mehr}%)</span><span class="green">+${fmt(r.zMehr)}</span></div>
-    <div class="row" style="border-top:1px solid var(--border);padding-top:0.7rem;margin-top:0.3rem;">
-      <span style="font-weight:500;">💰 Brutto</span>
-      <span style="color:var(--green);font-weight:500;font-size:1.1rem;">${fmt(r.brutto)}</span>
-    </div>`;
-}
-
-function hinzufuegen(){
-  const datum=document.getElementById('sDatum').value,von=document.getElementById('sVon').value,bis=document.getElementById('sBis').value;
-  const pause=parseInt(document.getElementById('sPause').value)||0,feiertag=document.getElementById('sFeiertag').checked;
-  const notiz=document.getElementById('sNotiz').value,art=document.getElementById('sArt').value;
-  if(!datum||!von||!bis){alert('Pflichtfelder fehlen.');return;}
-  const r=berechne(datum,von,bis,pause,feiertag);
-  schichten.push({id:Date.now(),datum,von,bis,pause,feiertag,notiz,art,...r});
-  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
-  renderSchichten();updateAuswertung();
-  document.getElementById('vorschau').style.display='none';
-  document.getElementById('sNotiz').value='';
-  document.getElementById('sFeiertag').checked=false;
-}
-
-function loeschen(id){
-  schichten=schichten.filter(s=>s.id!==id);
-  localStorage.setItem('dmk_schichten',JSON.stringify(schichten));
-  renderSchichten();updateAuswertung();
-}
-
-function alleWeg(){
-  if(confirm('Alle Schichten löschen?')){schichten=[];localStorage.removeItem('dmk_schichten');renderSchichten();updateAuswertung();}
-}
-
-function renderSchichten(){
-  const div=document.getElementById('schicht-liste');
-  if(!schichten.length){
-    div.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--muted);"><div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>Noch keine Schichten erfasst.</div>`;
-    return;
-  }
-  const sorted=[...schichten].sort((a,b)=>new Date(b.datum)-new Date(a.datum));
-  const artCls={frueh:'badge-early',spaet:'badge-late',nacht:'badge-night',custom:'badge-free'};
-  const artLbl={frueh:'Früh',spaet:'Spät',nacht:'Nacht',custom:'Eigen'};
-  div.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.5rem;max-height:520px;overflow-y:auto;">
-    ${sorted.map(s=>`
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <span class="badge ${artCls[s.art]||''}">${artLbl[s.art]||s.art}</span>
-            <span style="color:var(--muted);font-size:0.72rem;">${fmtDatum(s.datum)}</span>
-            ${s.feiertag?'<span style="font-size:0.8rem;">🎉</span>':''}
-            ${s.istSonntag?'<span style="font-size:0.8rem;">☀️</span>':''}
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="loeschen(${s.id})" style="padding:0.3rem 0.6rem;">✕</button>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:0.8rem;align-items:center;">
-            <span style="font-size:0.8rem;">${s.von}–${s.bis}</span>
-            <span class="accent" style="font-size:0.78rem;">${s.nettoH.toFixed(1)}h</span>
-            ${s.notiz?`<span style="color:var(--muted);font-size:0.7rem;">${s.notiz}</span>`:''}
-          </div>
-          <span class="green" style="font-weight:600;font-size:0.92rem;">${fmt(s.brutto)}</span>
-        </div>
-      </div>`).join('')}
-  </div>`;
-}
-
-// ── AUSWERTUNG ─────────────────────────────────────────────────────
-function updateAuswertung(){
-  const sum=k=>schichten.reduce((s,x)=>s+(x[k]||0),0);
-  const totH=sum('nettoH'),totGrund=sum('grundlohn'),totZusch=sum('zuschlaege'),totBrutto=sum('brutto');
-  const totNacht=sum('zNacht'),totSa1=sum('zSa1'),totSa2=sum('zSa2'),totSo=sum('zSo'),totFt=sum('zFt'),totMehr=sum('zMehr');
-
-  document.getElementById('stat-row').innerHTML=[
-    {l:'Gesamtstunden',v:totH.toFixed(1)+'h',  sub:schichten.length+' Schichten',       c:'var(--blue)'},
-    {l:'Grundlohn',    v:fmt(totGrund),          sub:'ohne Zuschläge',                   c:'var(--accent)'},
-    {l:'Zuschläge',    v:fmt(totZusch),          sub:(totBrutto>0?(totZusch/totBrutto*100).toFixed(1):0)+'% des Bruttos', c:'var(--green)'},
-    {l:'Brutto-Lohn',  v:fmt(totBrutto),         sub:'inkl. aller Zuschläge',             c:'var(--accent2)'},
-  ].map(s=>`<div class="stat" style="--stat-color:${s.c}"><div class="stat-label">${s.l}</div><div class="stat-value">${s.v}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
-
-  const pct=v=>totBrutto>0?(v/totBrutto*100):0;
-  const auf=document.getElementById('aufschluss');
-  if(!schichten.length){auf.innerHTML='<div style="color:var(--muted);padding:1rem 0;font-size:0.8rem;">Keine Daten vorhanden.</div>';return;}
-  auf.innerHTML=[
-    {l:'🌙 Nacht (20–05h)',   v:totNacht,    c:'var(--blue)'},
-    {l:'🟡 Sa bis 13h',       v:totSa1,     c:'#86efac'},
-    {l:'🟠 Sa ab 13h',        v:totSa2,     c:'var(--green)'},
-    {l:'☀️ Sonntag',          v:totSo,      c:'var(--accent2)'},
-    {l:'🔴 Feiertag',         v:totFt,      c:'var(--danger)'},
-    {l:'⏱ Mehrarbeit',        v:totMehr,    c:'var(--purple)'},
-  ].map(x=>`
-    <div class="row"><span class="row-label">${x.l}</span><span style="color:${x.c};">${fmt(x.v)}</span></div>
-    <div class="progress"><div class="progress-fill" style="width:${pct(x.v)}%;background:${x.c};"></div></div>
-  `).join('')+`
-    <div class="row" style="border-top:1px solid var(--border);margin-top:0.3rem;padding-top:0.7rem;">
-      <span>Zuschläge gesamt</span><span class="green">${fmt(totZusch)}</span>
-    </div>`;
-
-  const nNacht=schichten.filter(s=>s.nachtH>0).length;
-  const nSo=schichten.filter(s=>s.istSonntag).length;
-  const nSa=schichten.filter(s=>s.istSamstag).length;
-  const nFt=schichten.filter(s=>s.istFeiertag).length;
-  const effStd=totH>0?totBrutto/totH:0;
-  document.getElementById('statistik').innerHTML=`
-    <div class="row"><span class="row-label">Schichten gesamt</span><span>${schichten.length}</span></div>
-    <div class="row"><span class="row-label">🌙 Nachtschichten</span><span class="blue">${nNacht}</span></div>
-    <div class="row"><span class="row-label">☀️ Sonntagsschichten</span><span class="orange">${nSo}</span></div>
-    <div class="row"><span class="row-label">🟡 Samstagschichten</span><span class="green">${nSa}</span></div>
-    <div class="row"><span class="row-label">🔴 Feiertagsschichten</span><span class="red">${nFt}</span></div>
-    <div class="row"><span class="row-label">⌀ Std/Schicht</span><span>${(totH/schichten.length).toFixed(2)}h</span></div>
-    <div class="row"><span class="row-label">⌀ Eff. Stundenlohn</span><span class="green">${fmt(effStd)}/h</span></div>
-    <div class="row" style="border:none;"><span class="row-label">Mindestlohn-Check</span>
-      <span class="${effStd>=12.82?'green':'red'}">${totH>0?(effStd>=12.82?'✓ OK':'⚠ Prüfen!'):'-'}</span>
-    </div>`;
-
-  const tbody=document.getElementById('detail-table');
-  if(!tbody) return;
-  const artLbl2={frueh:'🌅 Früh',spaet:'🌆 Spät',nacht:'🌙 Nacht',custom:'✏️ Eigen'};
-  const sorted=[...schichten].sort((a,b)=>new Date(a.datum)-new Date(b.datum));
-  tbody.innerHTML=sorted.map(s=>`
+// ═══════════════════ DASHBOARD ═══════════════════
+function renderDashboard() {
+  const yearData = [
+    {m:'Jan',wt:23,u:0,k:0,ft:0},
+    {m:'Feb',wt:21,u:0,k:0,ft:0},
+    {m:'Mär',wt:21,u:0,k:0,ft:1},
+    {m:'Apr',wt:22,u:0,k:0,ft:1},
+    {m:'Mai',wt:21,u:0,k:0,ft:3},
+    {m:'Jun',wt:20,u:0,k:0,ft:1},
+    {m:'Jul',wt:23,u:0,k:0,ft:0},
+    {m:'Aug',wt:22,u:0,k:0,ft:0},
+    {m:'Sep',wt:21,u:0,k:0,ft:0},
+    {m:'Okt',wt:23,u:0,k:0,ft:1},
+    {m:'Nov',wt:21,u:0,k:0,ft:1},
+    {m:'Dez',wt:21,u:0,k:0,ft:2},
+  ];
+  const tbody = document.getElementById('jahres-tbody');
+  tbody.innerHTML = yearData.map((d,i) => `
     <tr>
-      <td>${fmtDatum(s.datum)}</td>
-      <td>${artLbl2[s.art]||s.art} ${s.feiertag?'🎉':''}</td>
-      <td>${s.von}–${s.bis}</td>
-      <td>${s.nettoH.toFixed(2)}</td>
-      <td>${fmt(s.grundlohn)}</td>
-      <td class="blue">${s.zNacht>0?fmt(s.zNacht):'-'}</td>
-      <td class="green">${(s.zSa1+s.zSa2+s.zSo)>0?fmt(s.zSa1+s.zSa2+s.zSo):'-'}</td>
-      <td class="red">${s.zFt>0?fmt(s.zFt):'-'}</td>
-      <td class="purple">${s.zMehr>0?fmt(s.zMehr):'-'}</td>
-      <td class="accent" style="font-weight:500;">${fmt(s.brutto)}</td>
-    </tr>`).join('')+
-    `<tr class="tr-total">
-      <td colspan="3">Gesamt</td><td>${totH.toFixed(2)}</td><td>${fmt(totGrund)}</td>
-      <td>${fmt(totNacht)}</td><td>${fmt(totSa1+totSa2+totSo)}</td><td>${fmt(totFt)}</td><td>${fmt(totMehr)}</td><td>${fmt(totBrutto)}</td>
+      <td>${d.m}</td>
+      <td class="mono">${d.wt}</td>
+      <td class="text-green">${d.u}</td>
+      <td class="text-red">${d.k}</td>
+      <td class="text-yellow">${d.ft}</td>
+      <td>${i===11 ? '<span class="chip chip-blue">Abgerechnet</span>' : '<span class="chip chip-green">Normal</span>'}</td>
+    </tr>`).join('');
+
+  const etbody = document.getElementById('entgelt-tbody');
+  etbody.innerHTML = [9,10,11,12].map(m => {
+    const d = entgeltData[m];
+    const hasData = d.brutto > 0;
+    return `<tr>
+      <td>${d.monat.replace(' 2024','')}</td>
+      <td class="mono text-right">${hasData ? fmt(d.brutto) : '—'}</td>
+      <td class="mono text-right text-red">${hasData ? fmt(d.abzuege) : '—'}</td>
+      <td class="mono text-right text-green">${hasData ? fmt(d.netto) : '—'}</td>
     </tr>`;
+  }).join('');
 }
 
-// ── LOHNCHECK ──────────────────────────────────────────────────────
-function lohnCheck(){
-  const erhalten=parseFloat(document.getElementById('ck_brutto').value);
-  const angGrund=parseFloat(document.getElementById('ck_grund').value)||0;
-  const angStd=parseFloat(document.getElementById('ck_stunden').value)||0;
-  const monat=document.getElementById('ck_monat').value;
-  if(!erhalten){alert('Bitte Brutto-Lohn eingeben.');return;}
+// ═══════════════════ CALENDAR ═══════════════════
+function renderCalendar(month) {
+  const mInfo = {9:{name:'September',days:30},10:{name:'Oktober',days:31},11:{name:'November',days:30},12:{name:'Dezember',days:31}};
+  const info = mInfo[month];
+  document.getElementById('cal-title').textContent = `📅 ${info.name} 2024`;
 
-  const ms=monat?schichten.filter(s=>s.datum.startsWith(monat)):schichten;
-  const totH=ms.reduce((s,x)=>s+x.nettoH,0);
-  const totGrund=ms.reduce((s,x)=>s+x.grundlohn,0);
-  const totZusch=ms.reduce((s,x)=>s+x.zuschlaege,0);
-  const totBrutto=ms.reduce((s,x)=>s+x.brutto,0);
-  const diff=erhalten-totBrutto;
-  const diffPct=totBrutto>0?(Math.abs(diff)/totBrutto*100):0;
+  // Build calendar: determine first weekday
+  const firstDay = getFirstWeekday(month);
+  const grid = document.getElementById('calendar-grid');
+  // Remove old day cells
+  while (grid.children.length > 7) grid.removeChild(grid.lastChild);
 
-  let alerts='';
-  if(!ms.length) alerts+=`<div class="alert alert-warn">⚠️ Keine Schichten für ${monat} gefunden. Bitte erst Schichten erfassen.</div>`;
-  else if(Math.abs(diff)<1) alerts+=`<div class="alert alert-ok">✅ Abrechnung stimmt! Differenz: ${fmt(diff)}</div>`;
-  else if(diff<0) alerts+=`<div class="alert alert-err">⚠️ Mögliche Unterzahlung: <strong>${fmt(Math.abs(diff))}</strong> (${diffPct.toFixed(1)}%) zu wenig. Betriebsrat kontaktieren!</div><div class="alert alert-info">📞 Betriebsrat Edewecht: 04405/188-43144</div>`;
-  else alerts+=`<div class="alert alert-warn">ℹ️ ${fmt(diff)} mehr als erwartet. Evtl. Prämie, Ausgleich, Schichtzulage?</div>`;
-
-  if(angGrund&&totGrund>0&&Math.abs(angGrund-totGrund)>2) alerts+=`<div class="alert alert-warn">⚠️ Grundlohn-Diff: erwartet ${fmt(totGrund)}, erhalten ${fmt(angGrund)} (Δ ${fmt(angGrund-totGrund)})</div>`;
-  if(angStd&&totH>0&&Math.abs(angStd-totH)>0.5) alerts+=`<div class="alert alert-warn">⚠️ Stunden-Diff: erwartet ${totH.toFixed(1)}h, laut Abrechnung ${angStd}h</div>`;
-
-  document.getElementById('check-ergebnis').innerHTML=`
-    <div class="card animate-in">
-      <div class="card-title"><div class="dot"></div>Ergebnis ${monat||'(alle Schichten)'}</div>
-      ${alerts}
-      <div class="sep"></div>
-      <div class="row"><span class="row-label">Analysierte Schichten</span><span>${ms.length}</span></div>
-      <div class="row"><span class="row-label">Berechneter Grundlohn</span><span>${fmt(totGrund)}</span></div>
-      <div class="row"><span class="row-label">Berechnete Zuschläge</span><span class="green">${fmt(totZusch)}</span></div>
-      <div class="row"><span class="row-label">Erwarteter Brutto</span><span class="accent">${fmt(totBrutto)}</span></div>
-      <div class="row"><span class="row-label">Erhaltener Brutto</span><span style="color:${diff>=0?'var(--green)':'var(--danger)'};">${fmt(erhalten)}</span></div>
-      <div class="row" style="border:none;">
-        <span class="row-label">Differenz</span>
-        <span style="color:${Math.abs(diff)<1?'var(--green)':diff>0?'var(--accent)':'var(--danger)'};font-weight:500;">
-          ${diff>=0?'+':''}${fmt(diff)}
-        </span>
-      </div>
-    </div>`;
-}
-
-// ── UTILS ──────────────────────────────────────────────────────────
-function fmt(n){return (n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});}
-function fmtDatum(d){const date=new Date(d+'T12:00:00');const t=['So','Mo','Di','Mi','Do','Fr','Sa'];return `${t[date.getDay()]} ${d.split('-').reverse().join('.')}`;}
-function fmtShort(d){return d.getDate()+'.'+(d.getMonth()+1)+'.';}
-
-function showTab(id,btn){
-  document.querySelectorAll('[id^="tab-"]').forEach(el=>{el.classList.remove('section-visible','animate-in');el.classList.add('section-hidden');});
-  document.querySelectorAll('.tab, .bnav-btn').forEach(t=>t.classList.remove('active'));
-  const el=document.getElementById('tab-'+id);
-  el.classList.remove('section-hidden');el.classList.add('section-visible','animate-in');
-  if(btn) btn.classList.add('active');
-  if(id==='auswertung'||id==='check') updateAuswertung();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ── NETTO-SCHÄTZUNG 2025 ───────────────────────────────────────────
-function berechneNetto(bruttoMonat) {
-  const sk = parseInt(einst.steuerklasse) || 1;
-  const kinder = parseFloat(einst.kinder) || 0;
-  const kirchensteuer = einst.kirchensteuer || false;
-  const bl = einst.bundesland || 'NW';
-  const pvKinder = einst.pvKinder || false;
-  const kvZusatz = parseFloat(einst.kvZusatz) || 1.7;
-
-  // ── Sozialversicherung ──────────────────────────────────────────
-  // Beitragsbemessungsgrenzen 2025
-  const bbgRV = 8050;   // monatlich West
-  const bbgKV = 5512.5; // monatlich
-
-  const rvBasis = Math.min(bruttoMonat, bbgRV);
-  const kvBasis = Math.min(bruttoMonat, bbgKV);
-
-  const rv   = rvBasis * 0.093;                        // Rentenvers. AN 9,3%
-  const alv  = rvBasis * 0.013;                        // Arbeitslosen AN 1,3%
-  const kv   = kvBasis * (0.073 + kvZusatz/2/100);     // GKV AN: 7,3% + ½ Zusatz
-  const pv   = kvBasis * (pvKinder ? 0.017 : 0.024);  // PV: 1,7% m. Kindern / 2,4% ohne
-
-  const svGesamt = rv + alv + kv + pv;
-
-  // ── Lohnsteuer (vereinfacht nach Grundtabelle 2025) ─────────────
-  // Jahresbrutto abzügl. SV-Pauschale (Arbeitnehmer-Pauschbetrag 1.230€/Jahr)
-  const jahrBrutto = bruttoMonat * 12;
-  const svJahr = svGesamt * 12;
-
-  // Kinderfreibetrag: 6.612€ je Kind (2025), aber nur bei SK 1,2,3,4
-  const kfb = (sk <= 4) ? kinder * 6612 : 0;
-
-  // Werbungskosten-Pauschbetrag
-  const wkPausch = 1230;
-
-  // zu versteuerndes Einkommen (zvE)
-  let zve = Math.max(0, jahrBrutto - svJahr - wkPausch - kfb);
-
-  // Grundfreibetrag 2025: 12.096€
-  const grundfb = 12096;
-
-  // Steuerklassen-Faktoren (vereinfacht):
-  // SK1: Grundtabelle
-  // SK2: Grundtabelle + Entlastungsbetrag 4.260€
-  // SK3: Splittingtabelle (zvE halbiert × 2)
-  // SK4: Grundtabelle
-  // SK5: kein Grundfreibetrag, hoher Prozentsatz
-  // SK6: ab 1. Euro besteuert, kein Grundfreibetrag
-  let lstJahr = 0;
-
-  if (sk === 5) {
-    // SK5: Mindest-Lohnsteuer ~ SK1 ohne Freibetrag, dann ×2 (Schätzung)
-    zve = Math.max(0, jahrBrutto - svJahr - wkPausch);
-    lstJahr = calcGrundsteuer(zve) * 1.25;
-  } else if (sk === 6) {
-    zve = Math.max(0, jahrBrutto - svJahr - wkPausch);
-    lstJahr = calcGrundsteuer(zve) * 1.4;
-  } else if (sk === 3) {
-    // Splitting: zvE halbieren, steuer × 2
-    const zveSplit = Math.max(0, (jahrBrutto*2 - svJahr - wkPausch - kfb) / 2);
-    lstJahr = calcGrundsteuer(zveSplit) * 2;
-  } else if (sk === 2) {
-    zve = Math.max(0, jahrBrutto - svJahr - wkPausch - kfb - 4260);
-    lstJahr = calcGrundsteuer(zve);
-  } else {
-    // SK1, SK4
-    lstJahr = calcGrundsteuer(zve);
+  // Add empty cells before first
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
   }
 
-  const lstMonat = lstJahr / 12;
+  for (let d = 1; d <= info.days; d++) {
+    const cell = document.createElement('div');
+    const day = dayData[month]?.[d] || {};
+    const wdIdx = ((firstDay + d - 1) % 7);
+    const isWe = wdIdx >= 5;
+    const isUrlaub = day.badge?.includes('U') || day.urlaub > 0;
+    const isKrank = day.badge?.includes('K');
+    const isFeiertag = day.feiertag;
+    const isAzv = day.badge?.includes('A');
 
-  // Solidaritätszuschlag (entfällt für ~90% der Stpfl. seit 2021)
-  // Freigrenze: 18.130€ LSt/Jahr → erst darüber, daher meist 0
-  const soliGrenze = 18130 / 12;
-  const soli = lstMonat > soliGrenze ? lstMonat * 0.055 : 0;
+    let cls = 'cal-day';
+    if (isWe || day.sa || day.so) cls += ' weekend';
+    if (isFeiertag) cls += ' holiday';
+    if (isUrlaub) cls += ' urlaub';
+    if (isKrank) cls += ' krank';
+    if (isAzv && !isWe) cls += ' urlaub';
+    cell.className = cls;
 
-  // Kirchensteuer: 9% NRW/BE/BB/HB/HH/MV/NI/RP/SL/ST/SH/TH | 8% BW/BY/HE/SN
-  const ksatz = ['BW','BY','HE','SN'].includes(bl) ? 0.08 : 0.09;
-  const ks = kirchensteuer ? lstMonat * ksatz : 0;
+    let badge = '';
+    if (isFeiertag) badge = '<span class="cal-badge badge-feiertag">FT</span>';
+    else if (isUrlaub) badge = '<span class="cal-badge badge-urlaub">U</span>';
+    else if (isKrank) badge = '<span class="cal-badge badge-krank">K</span>';
+    else if (isAzv) badge = '<span class="cal-badge badge-urlaub">AZV</span>';
+    else if (!isWe) badge = '<span class="cal-badge badge-worked">Arb.</span>';
+    else badge = '<span class="cal-badge badge-weekend">WE</span>';
 
-  const steuerGesamt = lstMonat + soli + ks;
-  const abzuegeGesamt = svGesamt + steuerGesamt;
-  const netto = bruttoMonat - abzuegeGesamt;
+    const timeStr = day.kommt ? `<div class="cal-time">${day.kommt}–${day.geht}</div>` : '';
+    const noteStr = day.note ? `<div class="cal-time" style="color:var(--text2)">${day.note}</div>` : '';
 
-  return {
-    brutto: bruttoMonat,
-    rv, alv, kv, pv, svGesamt,
-    lstMonat, soli, ks, steuerGesamt,
-    abzuegeGesamt, netto,
-    effRate: bruttoMonat > 0 ? (abzuegeGesamt/bruttoMonat*100) : 0
-  };
+    cell.innerHTML = `<div class="cal-day-num">${d}</div>${badge}${timeStr}${noteStr}`;
+    grid.appendChild(cell);
+  }
+
+  // Month stats
+  renderMonthStats(month, info.days, firstDay);
+  renderDaysList(month, info.days, firstDay);
 }
 
-// Grundtabelle-Berechnung 2025 (vereinfachte Formel nach §32a EStG)
-function calcGrundsteuer(zve) {
-  if (zve <= 12096) return 0;
-  if (zve <= 17005) {
-    const y = (zve - 12096) / 10000;
-    return (922.98 * y + 1400) * y;
-  }
-  if (zve <= 66760) {
-    const z = (zve - 17005) / 10000;
-    return (181.19 * z + 2397) * z + 1025.38;
-  }
-  if (zve <= 277825) {
-    return 0.42 * zve - 10602.13;
-  }
-  return 0.45 * zve - 18936.88;
+function getFirstWeekday(month) {
+  // Based on actual 2024 calendar
+  const fd = {9:6,10:1,11:4,12:6}; // 0=Mo..6=So
+  // Convert: Sep starts Su = index 6
+  // Our grid: Mo=0, Tu=1, We=2, Th=3, Fr=4, Sa=5, Su=6
+  return fd[month];
 }
 
-function berechneNettoVorschau() {
-  // Lese aktuelle Werte direkt aus Formular (live, vor Speichern)
-  const sl = parseFloat(document.getElementById('stundenLohn')?.value) || einst.stundenLohn;
-  const bruttoMonat = sl * 40 * 52 / 12; // Schätzung: 40h/Woche Jahresschnitt
+function renderMonthStats(month, days, firstDay) {
+  const data = dayData[month] || {};
+  let arbeitstage = 0, urlaub = 0, krank = 0, feiertage = 0, wochenende = 0, azv = 0;
 
-  // Temporäre einst-Werte für Berechnung
-  const tmpEinst = {
-    ...einst,
-    steuerklasse: parseInt(document.getElementById('steuerklasse')?.value) || einst.steuerklasse,
-    kinder: parseFloat(document.getElementById('kinder')?.value) || einst.kinder,
-    kirchensteuer: document.getElementById('kirchensteuer')?.checked ?? einst.kirchensteuer,
-    bundesland: document.getElementById('bundesland')?.value || einst.bundesland,
-    pvKinder: document.getElementById('pvKinder')?.checked ?? einst.pvKinder,
-    kvZusatz: parseFloat(document.getElementById('kvZusatz')?.value) || einst.kvZusatz,
-    kvTyp: document.getElementById('kvTyp')?.value || einst.kvTyp,
-  };
+  for (let d = 1; d <= days; d++) {
+    const wd = (firstDay + d - 1) % 7;
+    const day = data[d] || {};
+    if (wd >= 5 || day.sa || day.so) { wochenende++; continue; }
+    if (day.feiertag) { feiertage++; continue; }
+    if (day.urlaub > 0 || (day.badge && day.badge.includes('U'))) { urlaub++; continue; }
+    if (day.badge && day.badge.includes('K')) { krank++; continue; }
+    if (day.badge && day.badge.includes('A') && !day.badge.includes('Arb')) { azv++; continue; }
+    arbeitstage++;
+  }
 
-  const savedEinst = einst;
-  einst = tmpEinst; // temporarily swap for berechneNetto
-  const r = berechneNetto(bruttoMonat);
-  einst = savedEinst;
-
-  const div = document.getElementById('netto-vorschau-inhalt');
-  if (!div) return;
-
-  const vorname = document.getElementById('vorname')?.value || '';
-  const nachname = document.getElementById('nachname')?.value || '';
-  const name = (vorname || nachname) ? `${vorname} ${nachname}`.trim() : null;
-
-  const sk = tmpEinst.steuerklasse;
-  const skNamen = {1:'Ledig',2:'Alleinerziehend',3:'Verheiratet (hoch)',4:'Verheiratet (gleich)',5:'Verheiratet (niedrig)',6:'Zweitjob'};
-
-  div.innerHTML = `
-    ${name ? `<div style="font-size:0.72rem;color:var(--muted);margin-bottom:1rem;">👤 ${name}</div>` : ''}
-
-    <div style="background:var(--surface2);border-radius:10px;padding:1rem;margin-bottom:1rem;text-align:center;">
-      <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">Geschätztes Netto/Monat</div>
-      <div style="font-family:'Fraunces',serif;font-size:2.4rem;font-weight:700;color:var(--green);line-height:1;">${fmt(r.netto)}</div>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.4rem;">bei ${fmt(r.brutto)} Brutto · StKl. ${sk} (${skNamen[sk]})</div>
-    </div>
-
-    <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Abzüge im Detail</div>
-
-    <div class="row"><span class="row-label">🏦 Rentenversicherung (9,3%)</span><span class="red">− ${fmt(r.rv)}</span></div>
-    <div class="row"><span class="row-label">💼 Arbeitslosenvers. (1,3%)</span><span class="red">− ${fmt(r.alv)}</span></div>
-    <div class="row"><span class="row-label">🏥 Krankenversicherung</span><span class="red">− ${fmt(r.kv)}</span></div>
-    <div class="row"><span class="row-label">🧓 Pflegeversicherung</span><span class="red">− ${fmt(r.pv)}</span></div>
-    <div class="row" style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.1rem;">
-      <span>Sozialabgaben gesamt</span><span class="red" style="font-weight:500;">− ${fmt(r.svGesamt)}</span>
-    </div>
-
-    <div class="sep" style="margin:0.8rem 0;"></div>
-
-    <div class="row"><span class="row-label">📋 Lohnsteuer (StKl. ${sk})</span><span class="orange">− ${fmt(r.lstMonat)}</span></div>
-    ${r.soli > 0 ? `<div class="row"><span class="row-label">🔹 Solidaritätszuschlag</span><span class="orange">− ${fmt(r.soli)}</span></div>` : '<div class="row"><span class="row-label">🔹 Solidaritätszuschlag</span><span class="green">entfällt ✓</span></div>'}
-    ${tmpEinst.kirchensteuer ? `<div class="row"><span class="row-label">✝️ Kirchensteuer</span><span class="orange">− ${fmt(r.ks)}</span></div>` : ''}
-    <div class="row" style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.1rem;">
-      <span>Steuern gesamt</span><span class="orange" style="font-weight:500;">− ${fmt(r.steuerGesamt)}</span>
-    </div>
-
-    <div style="background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;padding:0.8rem 1rem;margin-top:0.8rem;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:0.8rem;">Effektive Abgabenquote</span>
-      <span style="color:var(--accent);font-weight:600;">${r.effRate.toFixed(1)}%</span>
-    </div>
-
-    <div class="tip" style="margin-top:0.8rem;">⚠️ Näherungswert. Steuerfreie Zuschläge (Nacht, So, FT) reduzieren die tatsächliche Steuer — dein echtes Netto kann höher sein!</div>
+  document.getElementById('month-stats').innerHTML = `
+    <div class="stat-card stat-blue"><div class="stat-label">Arbeitstage</div><div class="stat-value">${arbeitstage}</div></div>
+    <div class="stat-card stat-green"><div class="stat-label">Urlaub</div><div class="stat-value">${urlaub}</div></div>
+    <div class="stat-card stat-red"><div class="stat-label">Krank</div><div class="stat-value">${krank}</div></div>
+    <div class="stat-card stat-yellow"><div class="stat-label">Feiertage</div><div class="stat-value">${feiertage}</div></div>
+    <div class="stat-card"><div class="stat-label">Wochenende</div><div class="stat-value">${wochenende}</div></div>
+    <div class="stat-card stat-orange"><div class="stat-label">AZV/Sonder</div><div class="stat-value">${azv}</div></div>
   `;
 }
 
+const WD_NAMES = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 
+function renderDaysList(month, days, firstDay) {
+  const data = dayData[month] || {};
+  const tbody = document.getElementById('days-tbody');
+  let rows = '';
+
+  for (let d = 1; d <= days; d++) {
+    const wd = (firstDay + d - 1) % 7;
+    const day = data[d] || {};
+    const wdName = WD_NAMES[wd];
+    const isWe = wd >= 5 || day.sa || day.so;
+    const isUrlaub = day.urlaub > 0 || (day.badge && day.badge.includes('U') && !day.badge.includes('Arb'));
+    const isKrank = day.badge && day.badge.includes('K');
+    const isFeiertag = day.feiertag;
+    const isAzv = day.badge && day.badge.includes('A') && !day.badge.includes('Arb');
+
+    let typ = '', typColor = '';
+    if (isFeiertag) { typ = 'Feiertag'; typColor = 'text-yellow'; }
+    else if (isUrlaub) { typ = 'Urlaub'; typColor = 'text-green'; }
+    else if (isKrank) { typ = 'Krank'; typColor = 'text-red'; }
+    else if (isAzv) { typ = 'AZV-Tag'; typColor = 'text-orange'; }
+    else if (isWe) { typ = 'Wochenende'; typColor = 'text-muted'; }
+    else { typ = 'Arbeitstag'; typColor = 'text-blue'; }
+
+    const kommt = day.kommt || (isWe || isFeiertag ? '—' : '');
+    const geht = day.geht || (isWe || isFeiertag ? '—' : '');
+    const note = day.note || '';
+
+    let netto = '—';
+    if (day.kommt && day.geht && !isWe) {
+      const [kh,km] = day.kommt.split(':').map(Number);
+      const [gh,gm] = day.geht.split(':').map(Number);
+      const mins = (gh*60+gm) - (kh*60+km) - 30;
+      if (mins > 0) netto = (mins/60).toFixed(1)+'h';
+    }
+
+    rows += `<tr>
+      <td class="mono">${d}.</td>
+      <td class="${isWe ? 'text-muted' : ''}">${wdName}</td>
+      <td class="${typColor}">${typ}</td>
+      <td class="mono">${kommt}</td>
+      <td class="mono">${geht}</td>
+      <td class="mono">30 Min</td>
+      <td class="mono ${typColor}">${netto}</td>
+      <td class="text-muted">${note}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = rows;
+}
+
+// ═══════════════════ ENTGELT ═══════════════════
+function renderEntgelt(month) {
+  const d = entgeltData[month];
+  document.getElementById('entgelt-title').textContent = `💰 Entgeltabrechnung ${d.monat}`;
+  document.getElementById('ent-zeitraum').textContent = d.zeitraum;
+
+  const hasData = d.brutto > 0;
+
+  const lohnarten = {
+    basis: [
+      { name: 'Tarifentgelt ETV', val: hasData ? 3500 : 0 },
+      { name: 'Inflationsausgleich', val: 0 },
+      { name: 'Tarifl. Sonderzahlung', val: 0 },
+      { name: 'Tarifl. Urlaubsgeld', val: 0 },
+      { name: 'VWL AG-Anteil', val: 0 },
+      { name: 'DMK-Rente AG-Anteil', val: 0 },
+    ],
+    zeit: [
+      { name: 'Grundentgelt', val: hasData ? d.brutto : 0 },
+      { name: 'Zuschläge', val: 0 },
+      { name: 'Überstunden', val: 0 },
+    ],
+    abzuege: [
+      { name: 'Lohnsteuer', val: hasData ? 239.50 : 0, neg: true },
+      { name: 'Solidaritätszuschlag', val: 0, neg: true },
+      { name: 'Kirchensteuer (9%)', val: hasData ? 21.55 : 0, neg: true },
+      { name: 'Rentenversicherung (9,3%)', val: hasData ? 325.50 : 0, neg: true },
+      { name: 'Krankenversicherung', val: hasData ? 140.88 : 0, neg: true },
+      { name: 'Pflegeversicherung', val: hasData ? 53.38 : 0, neg: true },
+      { name: 'Arbeitslosenversicherung', val: hasData ? 42.00 : 0, neg: true },
+    ],
+    zahlungen: [
+      { name: 'Überweisung', val: hasData ? d.netto : 0 },
+    ]
+  };
+
+  const renderSection = (items) => items.map(i => `
+    <div class="detail-row">
+      <span class="detail-key">${i.name}</span>
+      <span class="mono ${i.neg ? 'text-red' : i.val > 0 ? 'text-blue' : 'text-muted'}">
+        ${i.neg && i.val > 0 ? '−' : ''}${fmt(Math.abs(i.val))}
+      </span>
+    </div>`).join('');
+
+  document.getElementById('entgelt-basis').innerHTML = renderSection(lohnarten.basis);
+  document.getElementById('entgelt-zeit').innerHTML = renderSection(lohnarten.zeit);
+  document.getElementById('entgelt-abzuege').innerHTML = renderSection(lohnarten.abzuege);
+  document.getElementById('entgelt-zahlungen').innerHTML = renderSection(lohnarten.zahlungen);
+}
+
+// ═══════════════════ ABWESENHEIT ═══════════════════
+function renderAbwesenheit() {
+  const months = {9:'September',10:'Oktober',11:'November',12:'Dezember'};
+  const tbody = document.getElementById('abwesenheit-tbody');
+  tbody.innerHTML = Object.entries(months).map(([m, name]) => {
+    const data = dayData[parseInt(m)] || {};
+    let u=0, k=0, ft=0, azv=0, su=0;
+    Object.values(data).forEach(d => {
+      if (d.urlaub) u += 1;
+      if (d.feiertag) ft += 1;
+      if (d.badge?.includes('K')) k += 1;
+      if (d.badge?.includes('A') && !d.badge?.includes('Arb')) azv += 1;
+    });
+    return `<tr>
+      <td>${name}</td>
+      <td class="${u ? 'text-green' : 'text-muted'}">${u}</td>
+      <td class="${k ? 'text-red' : 'text-muted'}">${k}</td>
+      <td class="${ft ? 'text-yellow' : 'text-muted'}">${ft}</td>
+      <td class="${azv ? 'text-orange' : 'text-muted'}">${azv}</td>
+      <td class="text-muted">${su}</td>
+    </tr>`;
+  }).join('');
+}
+
+function addAbwesenheit() {
+  alert('Abwesenheit wurde gespeichert (Demo-Modus).');
+}
+function clearAbwesenheit() {
+  document.getElementById('ab-tag').value = 1;
+}
+
+// ═══════════════════ STEUER ═══════════════════
+function berechneSteuern() {
+  const brutto = parseFloat(document.getElementById('steuer-lohn').value) || 0;
+  const stkl = parseInt(document.getElementById('steuer-klasse').value);
+  const kirche = parseInt(document.getElementById('steuer-kirche').value);
+  const kvSatz = parseFloat(document.getElementById('steuer-kv').value) / 100;
+
+  // Simplified German payroll tax calculation
+  // RV: 9.3%, KV: 4.025% + Zusatz 0.85%, PV: 1.525%, AV: 1.2%
+  const rv = brutto * 0.093;
+  const kv = brutto * 0.04025;
+  const pv = brutto * 0.01525;
+  const av = brutto * 0.012;
+
+  // Income tax (simplified progressive)
+  let lst = 0;
+  let svGesamt = rv + kv + pv + av;
+
+  // Very simplified tax calculation
+  // Annual gross
+  const annual = brutto * 12;
+  const aNetto = annual - svGesamt * 12;
+
+  // Apply basic allowances by Steuerklasse
+  const grundfreibetrag = stkl === 3 ? 24846 : 11604;
+  const zvE = Math.max(0, aNetto - grundfreibetrag - 1000); // 1000 = Arbeitnehmer-Pauschbetrag
+
+  let annualLST = 0;
+  if (zvE <= 0) annualLST = 0;
+  else if (zvE <= 17005) annualLST = 0.14 * zvE;
+  else if (zvE <= 66760) annualLST = (0.228 + 0.0000020934 * (zvE - 17005)) * zvE - 169.3;
+  else if (zvE <= 277825) annualLST = 0.42 * zvE - 9867;
+  else annualLST = 0.45 * zvE - 18187;
+
+  lst = Math.max(0, annualLST / 12);
+  const solz = lst > 1370 ? lst * 0.055 : 0;
+  const kist = kirche > 0 ? lst * (kirche / 100) : 0;
+
+  const gesamt = lst + solz + kist + rv + kv + pv + av;
+  const netto = brutto - gesamt;
+
+  document.getElementById('res-brutto').textContent = fmt(brutto);
+  document.getElementById('res-lst').textContent = fmt(lst);
+  document.getElementById('res-solz').textContent = fmt(solz);
+  document.getElementById('res-kist').textContent = fmt(kist);
+  document.getElementById('res-rv').textContent = fmt(rv);
+  document.getElementById('res-kv').textContent = fmt(kv);
+  document.getElementById('res-pv').textContent = fmt(pv);
+  document.getElementById('res-av').textContent = fmt(av);
+  document.getElementById('res-gesamt').textContent = fmt(gesamt);
+  document.getElementById('res-netto').textContent = fmt(netto);
+
+  // Progress bars
+  const netPct = (netto/brutto*100).toFixed(1);
+  const stPct = ((lst+solz+kist)/brutto*100).toFixed(1);
+  const svPct = ((rv+kv+pv+av)/brutto*100).toFixed(1);
+  document.getElementById('pct-netto').textContent = netPct + '%';
+  document.getElementById('pct-steuern').textContent = stPct + '%';
+  document.getElementById('pct-sv').textContent = svPct + '%';
+  document.getElementById('bar-netto').style.width = netPct + '%';
+  document.getElementById('bar-steuern').style.width = stPct + '%';
+  document.getElementById('bar-sv').style.width = svPct + '%';
+
+  // AG-Beiträge
+  const agRv = brutto * 0.093;
+  const agKv = brutto * 0.0765;
+  const agPv = brutto * 0.01525;
+  const agAv = brutto * 0.012;
+  const agGes = agRv + agKv + agPv + agAv;
+  document.getElementById('ag-rv').textContent = fmt(agRv);
+  document.getElementById('ag-kv').textContent = fmt(agKv);
+  document.getElementById('ag-pv').textContent = fmt(agPv);
+  document.getElementById('ag-av').textContent = fmt(agAv);
+  document.getElementById('ag-gesamt').textContent = fmt(agGes);
+  document.getElementById('ag-total').textContent = fmt(brutto + agGes);
+}
+
+// ═══════════════════ TIME ENTRY ═══════════════════
+function addTimeEntry() {
+  const m = parseInt(document.getElementById('et-monat').value);
+  const d = parseInt(document.getElementById('et-tag').value);
+  const kommt = document.getElementById('et-kommt').value;
+  const geht = document.getElementById('et-geht').value;
+  const pause = parseInt(document.getElementById('et-pause').value) || 0;
+  const typ = document.getElementById('et-typ').value;
+  const kst = document.getElementById('et-kst').value;
+
+  const mNames = {9:'September',10:'Oktober',11:'November',12:'Dezember'};
+  const wdIdx = (monthStartDays[m] + d - 1) % 7;
+  const wd = WD_NAMES[wdIdx];
+
+  let netto = '—';
+  if (kommt && geht) {
+    const [kh,km] = kommt.split(':').map(Number);
+    const [gh,gm] = geht.split(':').map(Number);
+    const mins = (gh*60+gm) - (kh*60+km) - pause;
+    netto = (mins/60).toFixed(2) + 'h';
+  }
+
+  const entry = { m, d, mName: mNames[m], wd, typ, kommt, geht, pause, netto, kst };
+  manualEntries.push(entry);
+  renderManualEntries();
+
+  const fb = document.getElementById('et-feedback');
+  fb.style.display = 'block';
+  fb.textContent = `✅ ${mNames[m]} ${d}. – ${wd} eingetragen.`;
+  setTimeout(() => fb.style.display = 'none', 3000);
+}
+
+function renderManualEntries() {
+  const tbody = document.getElementById('manual-tbody');
+  if (!manualEntries.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="text-muted" style="text-align:center;padding:20px">Noch keine manuellen Einträge</td></tr>';
+    return;
+  }
+  tbody.innerHTML = manualEntries.map((e, i) => `
+    <tr>
+      <td>${e.mName}</td>
+      <td class="mono">${e.d}.</td>
+      <td>${e.wd}</td>
+      <td class="text-blue">${e.typ}</td>
+      <td class="mono">${e.kommt}</td>
+      <td class="mono">${e.geht}</td>
+      <td class="mono">${e.pause} Min</td>
+      <td class="mono text-green">${e.netto}</td>
+      <td class="text-muted mono">${e.kst || '—'}</td>
+      <td><button class="btn btn-secondary" style="padding:3px 10px;font-size:11px" onclick="removeEntry(${i})">Löschen</button></td>
+    </tr>`).join('');
+}
+
+function removeEntry(i) {
+  manualEntries.splice(i, 1);
+  renderManualEntries();
+}
+
+function clearTimeForm() {
+  document.getElementById('et-tag').value = 1;
+  document.getElementById('et-kommt').value = '07:00';
+  document.getElementById('et-geht').value = '15:30';
+  document.getElementById('et-pause').value = 30;
+  document.getElementById('et-kst').value = '';
+}
+
+// ═══════════════════ NAV ═══════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('visible');
+  document.querySelector(`[onclick="showSection('${id}')"]`).classList.add('active');
+}
+
+// ═══════════════════ UTILS ═══════════════════
+function fmt(n) {
+  return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+// ═══════════════════ START ═══════════════════
 init();
 </script>
 
