@@ -1,1498 +1,164 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arbeitszeiterfassung & Entgeltabrechnung 2024</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+<title>Arbeitszeit App</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f6ef7">
+
+<style>
 :root {
-–bg: #0f1117;
-–surface: #1a1d2e;
-–surface2: #242740;
-–border: #2e3250;
-–accent: #4f6ef7;
-–accent2: #7c3aed;
-–green: #22c55e;
-–red: #ef4444;
-–yellow: #eab308;
-–orange: #f97316;
-–text: #e2e8f0;
-–text2: #94a3b8;
-–text3: #64748b;
-–radius: 10px;
+  --bg:#0f1117;
+  --surface:#1a1d2e;
+  --text:#e2e8f0;
+  --accent:#4f6ef7;
 }
 
-- { box-sizing: border-box; margin: 0; padding: 0; }
+body.light {
+  --bg:#f5f7fb;
+  --surface:#ffffff;
+  --text:#1e293b;
+}
 
 body {
-font-family: ‘Inter’, sans-serif;
-background: var(–bg);
-color: var(–text);
-min-height: 100vh;
-font-size: 14px;
+  margin:0;
+  font-family:Arial;
+  background:var(--bg);
+  color:var(--text);
 }
-
-/* ── Layout ── */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
 
 header {
-background: var(–surface);
-border-bottom: 1px solid var(–border);
-padding: 16px 24px;
-display: flex;
-align-items: center;
-gap: 16px;
-position: sticky;
-top: 0;
-z-index: 100;
+  padding:10px;
+  background:var(--surface);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.logo { font-size: 22px; }
-.header-title { font-size: 18px; font-weight: 700; }
-.header-sub { font-size: 12px; color: var(–text2); margin-top: 2px; }
-
-nav {
-display: flex;
-gap: 4px;
-padding: 12px 24px;
-background: var(–surface);
-border-bottom: 1px solid var(–border);
-overflow-x: auto;
+button {
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
 }
 
-.nav-btn {
-padding: 7px 16px;
-border-radius: 20px;
-border: 1px solid var(–border);
-background: transparent;
-color: var(–text2);
-cursor: pointer;
-font-size: 13px;
-font-family: inherit;
-white-space: nowrap;
-transition: all .15s;
-}
-.nav-btn:hover { background: var(–surface2); color: var(–text); }
-.nav-btn.active { background: var(–accent); border-color: var(–accent); color: #fff; font-weight: 600; }
+main { padding:10px; }
 
-main { flex: 1; padding: 24px; }
-
-/* ── Section ── */
-.section { display: none; }
-.section.visible { display: block; }
-
-/* ── Card ── */
-.card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: var(–radius);
-padding: 20px;
-margin-bottom: 16px;
-}
-.card-title {
-font-size: 15px;
-font-weight: 600;
-margin-bottom: 16px;
-display: flex;
-align-items: center;
-gap: 8px;
-}
-
-/* ── Grid stats ── */
-.stats-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-gap: 12px;
-margin-bottom: 20px;
-}
-.stat-card {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: var(–radius);
-padding: 14px 16px;
-}
-.stat-label { font-size: 11px; color: var(–text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-.stat-value { font-size: 22px; font-weight: 700; font-family: ‘JetBrains Mono’, monospace; }
-.stat-sub { font-size: 11px; color: var(–text3); margin-top: 3px; }
-.stat-green .stat-value { color: var(–green); }
-.stat-blue .stat-value { color: var(–accent); }
-.stat-yellow .stat-value { color: var(–yellow); }
-.stat-red .stat-value { color: var(–red); }
-.stat-orange .stat-value { color: var(–orange); }
-
-/* ── Month picker ── */
-.month-tabs {
-display: flex;
-gap: 6px;
-margin-bottom: 20px;
-flex-wrap: wrap;
-}
-.month-tab {
-padding: 6px 14px;
-border-radius: 6px;
-border: 1px solid var(–border);
-background: transparent;
-color: var(–text2);
-cursor: pointer;
-font-size: 12px;
-font-family: inherit;
-transition: all .15s;
-}
-.month-tab:hover { background: var(–surface2); color: var(–text); }
-.month-tab.active { background: var(–accent2); border-color: var(–accent2); color: #fff; font-weight: 600; }
-.month-tab.has-data { border-color: var(–accent); color: var(–accent); }
-.month-tab.has-data.active { background: var(–accent2); border-color: var(–accent2); color: #fff; }
-
-/* ── Calendar grid ── */
-.calendar-grid {
-display: grid;
-grid-template-columns: repeat(7, 1fr);
-gap: 4px;
-margin-bottom: 16px;
-}
-.cal-header {
-text-align: center;
-font-size: 11px;
-font-weight: 600;
-color: var(–text3);
-padding: 6px 0;
-text-transform: uppercase;
-letter-spacing: .5px;
-}
-.cal-day {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 8px 6px;
-min-height: 72px;
-cursor: pointer;
-transition: border-color .15s;
-}
-.cal-day:hover { border-color: var(–accent); }
-.cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
-.cal-day.weekend { background: #1e2138; }
-.cal-day.holiday { background: #1e2138; border-color: var(–yellow); }
-.cal-day.urlaub { border-color: var(–green); background: #16271e; }
-.cal-day.krank { border-color: var(–red); background: #271616; }
-.cal-day.worked { border-color: #334; }
-.cal-day.today { border-color: var(–accent); }
-
-.cal-day-num {
-font-size: 12px;
-font-weight: 600;
-color: var(–text2);
-margin-bottom: 4px;
-}
-.cal-day.weekend .cal-day-num, .cal-day.holiday .cal-day-num { color: var(–yellow); }
-.cal-day.urlaub .cal-day-num { color: var(–green); }
-.cal-day.krank .cal-day-num { color: var(–red); }
-
-.cal-badge {
-display: inline-block;
-font-size: 9px;
-font-weight: 700;
-padding: 1px 5px;
-border-radius: 3px;
-margin-bottom: 2px;
-}
-.badge-worked { background: #1e3a5f; color: var(–accent); }
-.badge-urlaub { background: #1a3a28; color: var(–green); }
-.badge-krank { background: #3a1a1a; color: var(–red); }
-.badge-feiertag { background: #3a3a1a; color: var(–yellow); }
-.badge-weekend { background: #2a2a3a; color: var(–text3); }
-
-.cal-time {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 9px;
-color: var(–text3);
-}
-
-/* ── Table ── */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th {
-background: var(–surface2);
-padding: 10px 12px;
-text-align: left;
-font-size: 11px;
-font-weight: 600;
-text-transform: uppercase;
-letter-spacing: .5px;
-color: var(–text2);
-border-bottom: 1px solid var(–border);
-white-space: nowrap;
-}
-tbody td {
-padding: 9px 12px;
-border-bottom: 1px solid var(–border);
-color: var(–text);
-}
-tbody tr:hover td { background: var(–surface2); }
-tbody tr:last-child td { border-bottom: none; }
-
-.mono { font-family: ‘JetBrains Mono’, monospace; }
-.text-right { text-align: right; }
-.text-green { color: var(–green); }
-.text-red { color: var(–red); }
-.text-yellow { color: var(–yellow); }
-.text-blue { color: var(–accent); }
-.text-orange { color: var(–orange); }
-.text-muted { color: var(–text3); }
-
-/* ── Form ── */
-.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group label { font-size: 12px; color: var(–text2); font-weight: 500; }
-.form-group input, .form-group select {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 6px;
-padding: 8px 12px;
-color: var(–text);
-font-family: inherit;
-font-size: 13px;
-outline: none;
-transition: border-color .15s;
-}
-.form-group input:focus, .form-group select:focus { border-color: var(–accent); }
-
-.btn {
-padding: 9px 20px;
-border-radius: 6px;
-border: none;
-cursor: pointer;
-font-family: inherit;
-font-size: 13px;
-font-weight: 600;
-transition: opacity .15s;
-}
-.btn:hover { opacity: .85; }
-.btn-primary { background: var(–accent); color: #fff; }
-.btn-secondary { background: var(–surface2); color: var(–text); border: 1px solid var(–border); }
-
-/* ── Detail panel ── */
-.detail-panel {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: var(–radius);
-padding: 16px;
-margin-top: 16px;
-}
-.detail-panel h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
-.detail-row {
-display: flex;
-justify-content: space-between;
-padding: 6px 0;
-border-bottom: 1px solid var(–border);
-font-size: 13px;
-}
-.detail-row:last-child { border-bottom: none; }
-.detail-key { color: var(–text2); }
-
-/* ── Legend ── */
-.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(–text2); }
-.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-
-/* ── Progress bar ── */
-.progress-bar {
-height: 6px;
-background: var(–border);
-border-radius: 3px;
-overflow: hidden;
-margin-top: 8px;
-}
-.progress-fill {
-height: 100%;
-border-radius: 3px;
-background: var(–accent);
-transition: width .3s;
-}
-
-/* ── Chip ── */
-.chip {
-display: inline-flex;
-align-items: center;
-padding: 3px 10px;
-border-radius: 20px;
-font-size: 11px;
-font-weight: 600;
-}
-.chip-green { background: #16271e; color: var(–green); border: 1px solid #22c55e44; }
-.chip-red { background: #271616; color: var(–red); border: 1px solid #ef444444; }
-.chip-yellow { background: #272016; color: var(–yellow); border: 1px solid #eab30844; }
-.chip-blue { background: #161c36; color: var(–accent); border: 1px solid #4f6ef744; }
-
-/* ── Responsive ── */
-@media (max-width: 640px) {
-main { padding: 12px; }
-.calendar-grid { grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.cal-day { min-height: 50px; padding: 4px 3px; }
-.stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(–surface); }
-::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
-
-.section-divider {
-border: none;
-border-top: 1px solid var(–border);
-margin: 20px 0;
-}
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+input { padding:6px; margin:4px; }
 </style>
-
 </head>
+
 <body>
-<div class="app">
 
-  <header>
-    <span class="logo">📊</span>
-    <div>
-      <div class="header-title">Arbeitszeiterfassung & Entgeltabrechnung</div>
-      <div class="header-sub">Abrechnungsjahr 2024 · AWSF</div>
-    </div>
-  </header>
-
-  <nav>
-    <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
-    <button class="nav-btn" onclick="showSection('zeiterfassung')">Zeiterfassung</button>
-    <button class="nav-btn" onclick="showSection('entgelt')">Entgeltabrechnung</button>
-    <button class="nav-btn" onclick="showSection('urlaub')">Urlaub & Abwesenheit</button>
-    <button class="nav-btn" onclick="showSection('steuer')">Lohnsteuer</button>
-    <button class="nav-btn" onclick="showSection('eintragen')">Zeiten eintragen</button>
-  </nav>
-
-  <main>
-
-```
-<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
-<div id="section-dashboard" class="section visible">
-
-  <div class="stats-grid">
-    <div class="stat-card stat-green">
-      <div class="stat-label">Nettolohn (Dez)</div>
-      <div class="stat-value">2.677 €</div>
-      <div class="stat-sub">Brutto: 3.500 €</div>
-    </div>
-    <div class="stat-card stat-blue">
-      <div class="stat-label">Urlaubsanspruch</div>
-      <div class="stat-value">34 Tage</div>
-      <div class="stat-sub">Zusatz: 4 Tage</div>
-    </div>
-    <div class="stat-card stat-yellow">
-      <div class="stat-label">Urlaubsrest 2024</div>
-      <div class="stat-value">34 Tage</div>
-      <div class="stat-sub">Verbraucht: 0 Tage</div>
-    </div>
-    <div class="stat-card stat-orange">
-      <div class="stat-label">AZV-Tage</div>
-      <div class="stat-value">12 Tage</div>
-      <div class="stat-sub">Verbraucht: 0</div>
-    </div>
-    <div class="stat-card stat-red">
-      <div class="stat-label">Steuerklasse</div>
-      <div class="stat-value">III</div>
-      <div class="stat-sub">KiSt: 9%</div>
-    </div>
-    <div class="stat-card stat-blue">
-      <div class="stat-label">Abzüge (Dez)</div>
-      <div class="stat-value">822 €</div>
-      <div class="stat-sub">Steuern + SV</div>
-    </div>
+<header>
+  <div>📊 Arbeitszeit</div>
+  <div>
+    <button onclick="toggleTheme()">🌙</button>
+    <button id="install-btn" style="display:none">📲 Installieren</button>
   </div>
+</header>
 
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">🗓️ Übersicht Arbeitstage 2024</div>
-      <div id="jahresuebersicht-chart"></div>
-      <table>
-        <thead><tr>
-          <th>Monat</th>
-          <th>Arbeitstage</th>
-          <th>Urlaub</th>
-          <th>Krank</th>
-          <th>Feiertage</th>
-          <th>Status</th>
-        </tr></thead>
-        <tbody id="jahres-tbody"></tbody>
-      </table>
-    </div>
+<main>
+  <h3>Zeiterfassung</h3>
 
-    <div class="card">
-      <div class="card-title">💰 Entgeltübersicht 2024</div>
-      <table>
-        <thead><tr>
-          <th>Monat</th>
-          <th class="text-right">Brutto</th>
-          <th class="text-right">Abzüge</th>
-          <th class="text-right">Netto</th>
-        </tr></thead>
-        <tbody id="entgelt-tbody"></tbody>
-      </table>
-      <hr class="section-divider">
-      <div class="detail-row">
-        <span class="detail-key">Jahres-Brutto (Dez)</span>
-        <span class="mono text-blue">3.500,00 €</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Jahres-Abzüge (Dez)</span>
-        <span class="mono text-red">822,81 €</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Jahres-Netto (Dez)</span>
-        <span class="mono text-green">2.677,19 €</span>
-      </div>
-    </div>
-  </div>
+  <input type="date" id="date">
+  <input type="time" id="start">
+  <input type="time" id="end">
+  <input type="number" id="pause" placeholder="Pause (Min)">
 
-  <div class="card">
-    <div class="card-title">📋 Aktuelle Abrechnungsperiode – Dezember 2024</div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Lohnsteuer</div>
-        <div class="stat-value mono" style="font-size:16px">239,50 €</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Rentenversicherung</div>
-        <div class="stat-value mono" style="font-size:16px">325,50 €</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Krankenversicherung</div>
-        <div class="stat-value mono" style="font-size:16px">140,88 €</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Pflegeversicherung</div>
-        <div class="stat-value mono" style="font-size:16px">53,38 €</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Arbeitslosenvers.</div>
-        <div class="stat-value mono" style="font-size:16px">42,00 €</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Kirchensteuer</div>
-        <div class="stat-value mono" style="font-size:16px">21,55 €</div>
-      </div>
-    </div>
-  </div>
+  <br>
+  <button onclick="addEntry()">Speichern</button>
 
-</div>
-
-<!-- ═══════════════════ ZEITERFASSUNG ═══════════════════ -->
-<div id="section-zeiterfassung" class="section">
-
-  <div class="month-tabs" id="time-month-tabs"></div>
-
-  <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Urlaub</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Krank</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div> Feiertag</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#4f6ef7"></div> Arbeitstag</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2a2a3a"></div> Wochenende</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title" id="cal-title">📅 September 2024</div>
-    <div class="calendar-grid" id="calendar-grid">
-      <div class="cal-header">Mo</div>
-      <div class="cal-header">Di</div>
-      <div class="cal-header">Mi</div>
-      <div class="cal-header">Do</div>
-      <div class="cal-header">Fr</div>
-      <div class="cal-header">Sa</div>
-      <div class="cal-header">So</div>
-    </div>
-  </div>
-
-  <div class="card" id="month-stats-card">
-    <div class="card-title">📊 Monatsstatistik</div>
-    <div class="stats-grid" id="month-stats"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📋 Tagesliste</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Tag</th>
-          <th>Wochentag</th>
-          <th>Typ</th>
-          <th>Kommt</th>
-          <th>Geht</th>
-          <th>Pause</th>
-          <th>Netto-Std</th>
-          <th>Bemerkung</th>
-        </tr></thead>
-        <tbody id="days-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════ ENTGELT ═══════════════════ -->
-<div id="section-entgelt" class="section">
-
-  <div class="month-tabs" id="entgelt-month-tabs"></div>
-
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title" id="entgelt-title">💰 Entgeltabrechnung September 2024</div>
-      <div class="detail-panel">
-        <h4>Basisbezüge</h4>
-        <div id="entgelt-basis"></div>
-      </div>
-      <div class="detail-panel">
-        <h4>Zeitbezüge</h4>
-        <div id="entgelt-zeit"></div>
-      </div>
-      <div class="detail-panel">
-        <h4>Abzüge</h4>
-        <div id="entgelt-abzuege"></div>
-      </div>
-      <div class="detail-panel">
-        <h4>Zahlungen</h4>
-        <div id="entgelt-zahlungen"></div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card">
-        <div class="card-title">📋 Urlaubsdaten</div>
-        <table>
-          <thead><tr><th>Art</th><th>Zeitraum</th><th>Anspruch</th><th>Abgetragen</th><th>Rest</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>Tarifurlaub</td>
-              <td class="text-muted">1.01.–31.12.2024</td>
-              <td class="text-blue">34</td>
-              <td>0</td>
-              <td class="text-green">34</td>
-            </tr>
-            <tr>
-              <td>Zusatzurlaub</td>
-              <td class="text-muted">1.01.–31.12.2024</td>
-              <td class="text-blue">4</td>
-              <td>—</td>
-              <td class="text-green">4</td>
-            </tr>
-            <tr>
-              <td>AZV-Tage</td>
-              <td class="text-muted">1.01.–31.12.2024</td>
-              <td class="text-blue">12</td>
-              <td>0</td>
-              <td class="text-green">12</td>
-            </tr>
-            <tr>
-              <td>Umkleidekontingent</td>
-              <td class="text-muted">1.01.–31.12.2023</td>
-              <td class="text-blue">12</td>
-              <td>0</td>
-              <td class="text-green">12</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🏛️ Kostenstelleninfo</div>
-        <div class="detail-panel">
-          <div class="detail-row"><span class="detail-key">Abt.</span><span>AWSF</span></div>
-          <div class="detail-row"><span class="detail-key">Kostenstelle</span><span class="mono">0</span></div>
-          <div class="detail-row"><span class="detail-key">Personalnr.</span><span class="mono">0</span></div>
-          <div class="detail-row"><span class="detail-key">Zeitraum</span><span id="ent-zeitraum"></span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════ URLAUB ═══════════════════ -->
-<div id="section-urlaub" class="section">
-
-  <div class="card">
-    <div class="card-title">🏖️ Urlaubskonto 2024</div>
-    <div class="stats-grid">
-      <div class="stat-card stat-blue">
-        <div class="stat-label">Tarifurlaub Anspruch</div>
-        <div class="stat-value">34</div>
-        <div class="stat-sub">Tage im Jahr</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:var(--green)"></div></div>
-      </div>
-      <div class="stat-card stat-green">
-        <div class="stat-label">Tarifurlaub Rest</div>
-        <div class="stat-value">34</div>
-        <div class="stat-sub">Noch verfügbar</div>
-      </div>
-      <div class="stat-card stat-blue">
-        <div class="stat-label">Zusatzurlaub</div>
-        <div class="stat-value">4</div>
-        <div class="stat-sub">Tage</div>
-      </div>
-      <div class="stat-card stat-yellow">
-        <div class="stat-label">AZV-Tage</div>
-        <div class="stat-value">12</div>
-        <div class="stat-sub">Verfügbar</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📅 Abwesenheitsübersicht nach Monat</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Monat</th>
-          <th>Urlaubstage</th>
-          <th>Krankheitstage</th>
-          <th>Feiertage</th>
-          <th>AZV-Tage</th>
-          <th>Sonderurlaub</th>
-        </tr></thead>
-        <tbody id="abwesenheit-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">➕ Abwesenheit erfassen</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Monat</label>
-        <select id="ab-monat">
-          <option value="9">September</option>
-          <option value="10">Oktober</option>
-          <option value="11">November</option>
-          <option value="12">Dezember</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Tag (1–31)</label>
-        <input type="number" id="ab-tag" min="1" max="31" value="1">
-      </div>
-      <div class="form-group">
-        <label>Art</label>
-        <select id="ab-art">
-          <option value="U">Urlaub (U)</option>
-          <option value="K">Krank (K)</option>
-          <option value="F">Feiertag (F)</option>
-          <option value="AZV">AZV-Tag</option>
-          <option value="SU">Sonderurlaub</option>
-        </select>
-      </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-primary" onclick="addAbwesenheit()">Eintragen</button>
-      <button class="btn btn-secondary" onclick="clearAbwesenheit()">Zurücksetzen</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════ STEUER ═══════════════════ -->
-<div id="section-steuer" class="section">
-
-  <div class="card">
-    <div class="card-title">🏛️ Lohnsteuerberechnung 2024</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Steuerpflichtiger Arbeitslohn (€)</label>
-        <input type="number" id="steuer-lohn" value="3500" step="50">
-      </div>
-      <div class="form-group">
-        <label>Steuerklasse</label>
-        <select id="steuer-klasse">
-          <option>1</option><option>2</option><option selected>3</option>
-          <option>4</option><option>5</option><option>6</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Kirchensteuer (%)</label>
-        <select id="steuer-kirche">
-          <option value="0">Keine (0%)</option>
-          <option value="8">8%</option>
-          <option value="9" selected>9%</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>KV-Beitragssatz (Arbeitnehmer-Anteil, %)</label>
-        <input type="number" id="steuer-kv" value="8.05" step="0.01">
-      </div>
-      <div class="form-group">
-        <label>Zahlungszeitraum</label>
-        <select id="steuer-lzz">
-          <option value="1">Jährlich</option>
-          <option value="2" selected>Monatlich</option>
-          <option value="3">Wöchentlich</option>
-          <option value="4">Täglich</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Kinderfreibetrag</label>
-        <input type="number" id="steuer-kfb" value="0" step="0.5">
-      </div>
-    </div>
-    <div style="margin-top:16px">
-      <button class="btn btn-primary" onclick="berechneSteuern()">Berechnen</button>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">📊 Berechnungsergebnis</div>
-      <div id="steuer-ergebnis">
-        <div class="detail-panel">
-          <div class="detail-row"><span class="detail-key">Bruttolohn</span><span class="mono text-blue" id="res-brutto">3.500,00 €</span></div>
-          <div class="detail-row"><span class="detail-key">Lohnsteuer</span><span class="mono text-red" id="res-lst">239,50 €</span></div>
-          <div class="detail-row"><span class="detail-key">Solidaritätszuschlag</span><span class="mono text-red" id="res-solz">0,00 €</span></div>
-          <div class="detail-row"><span class="detail-key">Kirchensteuer (9%)</span><span class="mono text-red" id="res-kist">21,55 €</span></div>
-          <div class="detail-row"><span class="detail-key">Rentenversicherung (9,3%)</span><span class="mono text-red" id="res-rv">325,50 €</span></div>
-          <div class="detail-row"><span class="detail-key">Krankenversicherung (4,025%)</span><span class="mono text-red" id="res-kv">140,88 €</span></div>
-          <div class="detail-row"><span class="detail-key">Pflegeversicherung (1,525%)</span><span class="mono text-red" id="res-pv">53,38 €</span></div>
-          <div class="detail-row"><span class="detail-key">Arbeitslosenversicherung (1,2%)</span><span class="mono text-red" id="res-av">42,00 €</span></div>
-          <hr class="section-divider">
-          <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamt Abzüge</span><span class="mono text-red" id="res-gesamt">822,81 €</span></div>
-          <div class="detail-row" style="font-size:16px;padding:12px 0"><span class="detail-key" style="font-weight:700">Nettolohn</span><span class="mono text-green" id="res-netto" style="font-size:20px;font-weight:700">2.677,19 €</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">📈 Abzugsquote</div>
-      <div id="abzug-vis">
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Netto</span><span id="pct-netto">76,5%</span></div>
-          <div class="progress-bar" style="height:14px">
-            <div class="progress-fill" id="bar-netto" style="width:76.5%;background:var(--green)"></div>
-          </div>
-        </div>
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Steuern</span><span id="pct-steuern">7,5%</span></div>
-          <div class="progress-bar" style="height:14px">
-            <div class="progress-fill" id="bar-steuern" style="width:7.5%;background:var(--red)"></div>
-          </div>
-        </div>
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Sozialversicherung</span><span id="pct-sv">16%</span></div>
-          <div class="progress-bar" style="height:14px">
-            <div class="progress-fill" id="bar-sv" style="width:16%;background:var(--accent)"></div>
-          </div>
-        </div>
-      </div>
-
-      <hr class="section-divider">
-      <div class="card-title">📋 Arbeitgeberbeiträge (Schätzung)</div>
-      <div class="detail-panel">
-        <div class="detail-row"><span class="detail-key">RV AG (9,3%)</span><span class="mono" id="ag-rv">325,50 €</span></div>
-        <div class="detail-row"><span class="detail-key">KV AG (~7,65%)</span><span class="mono" id="ag-kv">267,75 €</span></div>
-        <div class="detail-row"><span class="detail-key">PV AG (1,525%)</span><span class="mono" id="ag-pv">53,38 €</span></div>
-        <div class="detail-row"><span class="detail-key">AV AG (1,2%)</span><span class="mono" id="ag-av">42,00 €</span></div>
-        <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamt AG-Beiträge</span><span class="mono text-yellow" id="ag-gesamt">688,63 €</span></div>
-        <div class="detail-row"><span class="detail-key" style="font-weight:700">Gesamtkosten AG</span><span class="mono text-orange" id="ag-total">4.188,63 €</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════ EINTRAGEN ═══════════════════ -->
-<div id="section-eintragen" class="section">
-  <div class="card">
-    <div class="card-title">⏱️ Arbeitszeit eintragen</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Monat</label>
-        <select id="et-monat">
-          <option value="9">September</option>
-          <option value="10">Oktober</option>
-          <option value="11">November</option>
-          <option value="12">Dezember</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Tag</label>
-        <input type="number" id="et-tag" min="1" max="31" value="1">
-      </div>
-      <div class="form-group">
-        <label>Kommt (Uhr)</label>
-        <input type="time" id="et-kommt" value="07:00">
-      </div>
-      <div class="form-group">
-        <label>Geht (Uhr)</label>
-        <input type="time" id="et-geht" value="15:30">
-      </div>
-      <div class="form-group">
-        <label>Pause (Minuten)</label>
-        <input type="number" id="et-pause" value="30" min="0">
-      </div>
-      <div class="form-group">
-        <label>Typ</label>
-        <select id="et-typ">
-          <option value="A">Arbeitstag</option>
-          <option value="U">Urlaub</option>
-          <option value="K">Krank</option>
-          <option value="F">Feiertag</option>
-          <option value="AZV">AZV-Tag</option>
-          <option value="SU">Sonderurlaub</option>
-        </select>
-      </div>
-      <div class="form-group" style="grid-column:1/-1">
-        <label>Kostenstelle (optional)</label>
-        <input type="text" id="et-kst" placeholder="z.B. 2221">
-      </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-primary" onclick="addTimeEntry()">Eintragen</button>
-      <button class="btn btn-secondary" onclick="clearTimeForm()">Leeren</button>
-    </div>
-    <div id="et-feedback" style="margin-top:12px;font-size:13px;color:var(--green);display:none"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📋 Manuell erfasste Einträge</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Monat</th><th>Tag</th><th>Wochentag</th><th>Typ</th>
-          <th>Kommt</th><th>Geht</th><th>Pause</th><th>Netto-Std</th><th>Kostenstelle</th><th>Aktion</th>
-        </tr></thead>
-        <tbody id="manual-tbody">
-          <tr><td colspan="10" class="text-muted" style="text-align:center;padding:20px">Noch keine manuellen Einträge</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-```
-
-  </main>
-</div>
+  <h3>Einträge</h3>
+  <div id="list"></div>
+</main>
 
 <script>
-// ═══════════════════ DATA ═══════════════════
+// ===== STORAGE =====
+const KEY = 'app_v1';
 
-const MONTHS = {
-  9:  { name: 'September', days: 30, start: 0 }, // 0=Mo
-  10: { name: 'Oktober',   days: 31, start: 1 }, // 1=Di
-  11: { name: 'November',  days: 4 }, // starts Fr
-  12: { name: 'Dezember',  days: 31, start: 6 }, // starts So
+let data = JSON.parse(localStorage.getItem(KEY)) || {
+  entries: [],
+  theme: 'dark'
 };
 
-// Real day data extracted from the Excel
-const dayData = {
-  9: {
-    // day: { typ, kommt, geht, special }
-    // From September sheet analysis
-    1: { typ: 'So', badge: 'F', special: 'Sonntag', frei: true },
-    2: { typ: 'Mo', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
-    3: { typ: 'Di', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
-    4: { typ: 'Mi', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
-    5: { typ: 'Do', badge: 'F', kommt: '', geht: '', note: 'Arbeitstag' },
-    6: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    7: { typ: 'Sa', badge: '37F', sa: true },
-    8: { typ: 'So', badge: '6F', so: true },
-    9: { typ: 'Mo', badge: 'F' },
-    10: { typ: 'Di', badge: 'F' },
-    11: { typ: 'Mi', badge: 'F' },
-    12: { typ: 'Do', badge: 'F' },
-    13: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    14: { typ: 'Sa', badge: '37F', sa: true },
-    15: { typ: 'So', badge: '6F', so: true },
-    16: { typ: 'Mo', badge: 'F' },
-    17: { typ: 'Di', badge: 'F' },
-    18: { typ: 'Mi', badge: 'F' },
-    19: { typ: 'Do', badge: 'F' },
-    20: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    21: { typ: 'Sa', badge: '37F', sa: true },
-    22: { typ: 'So', badge: '6F', so: true },
-    23: { typ: 'Mo', badge: 'F' },
-    24: { typ: 'Di', badge: 'F' },
-    25: { typ: 'Mi', badge: 'F' },
-    26: { typ: 'Do', badge: 'F' },
-    27: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    28: { typ: 'Sa', badge: '37F', sa: true },
-    29: { typ: 'So', badge: '6F', so: true },
-    30: { typ: 'Mo', badge: 'F' },
-  },
-  10: {
-    1: { typ: 'Di', badge: 'F' },
-    2: { typ: 'Mi', badge: '2F', urlaub: 2 },
-    3: { typ: 'Do', badge: '1F', feiertag: true, note: 'Tag der Deutschen Einheit', kommt: '00:00', geht: '08:00' },
-    4: { typ: 'Fr', badge: '4DF', urlaub: 4, note: 'D=Dienst?' },
-    5: { typ: 'Sa', badge: '37F', sa: true },
-    6: { typ: 'So', badge: '6F', so: true },
-    7: { typ: 'Mo', badge: 'F' },
-    8: { typ: 'Di', badge: 'F' },
-    9: { typ: 'Mi', badge: 'F' },
-    10: { typ: 'Do', badge: 'F' },
-    11: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    12: { typ: 'Sa', badge: '37F', sa: true },
-    13: { typ: 'So', badge: '6F', so: true },
-    14: { typ: 'Mo', badge: 'F' },
-    15: { typ: 'Di', badge: 'F' },
-    16: { typ: 'Mi', badge: 'F' },
-    17: { typ: 'Do', badge: 'F' },
-    18: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    19: { typ: 'Sa', badge: '37F', sa: true },
-    20: { typ: 'So', badge: '6F', so: true },
-    21: { typ: 'Mo', badge: 'F' },
-    22: { typ: 'Di', badge: 'F' },
-    23: { typ: 'Mi', badge: 'F' },
-    24: { typ: 'Do', badge: 'F' },
-    25: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    26: { typ: 'Sa', badge: '37F', sa: true },
-    27: { typ: 'So', badge: '6F', so: true },
-    28: { typ: 'Mo', badge: 'F' },
-    29: { typ: 'Di', badge: 'F' },
-    30: { typ: 'Mi', badge: 'F' },
-    31: { typ: 'Do', badge: 'F' },
-  },
-  11: {
-    1: { typ: 'Fr', badge: '4DF', urlaub: 4, note: 'Allerheiligen (Bayern)' },
-    2: { typ: 'Sa', badge: '37F', sa: true },
-    3: { typ: 'So', badge: '6F', so: true },
-    4: { typ: 'Mo', badge: 'F' },
-    5: { typ: 'Di', badge: 'F' },
-    6: { typ: 'Mi', badge: 'F' },
-    7: { typ: 'Do', badge: 'F' },
-    8: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    9: { typ: 'Sa', badge: '37F', sa: true },
-    10: { typ: 'So', badge: '6F', so: true },
-    11: { typ: 'Mo', badge: 'F' },
-    12: { typ: 'Di', badge: 'F' },
-    13: { typ: 'Mi', badge: 'F' },
-    14: { typ: 'Do', badge: 'F' },
-    15: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    16: { typ: 'Sa', badge: '37F', sa: true },
-    17: { typ: 'So', badge: '6F', so: true },
-    18: { typ: 'Mo', badge: 'F' },
-    19: { typ: 'Di', badge: 'F' },
-    20: { typ: 'Mi', badge: 'F' },
-    21: { typ: 'Do', badge: 'F' },
-    22: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    23: { typ: 'Sa', badge: '37F', sa: true },
-    24: { typ: 'So', badge: '6F', so: true },
-    25: { typ: 'Mo', badge: 'F' },
-    26: { typ: 'Di', badge: '4F', urlaub: 4 },
-    27: { typ: 'Mi', badge: '37F', sa: true },
-    28: { typ: 'Do', badge: '6F', so: true },
-    29: { typ: 'Fr', badge: 'F' },
-    30: { typ: 'Sa', badge: '37F', sa: true },
-  },
-  12: {
-    1: { typ: 'So', badge: '6F', so: true },
-    2: { typ: 'Mo', badge: 'F' },
-    3: { typ: 'Di', badge: 'F' },
-    4: { typ: 'Mi', badge: 'F' },
-    5: { typ: 'Do', badge: 'F' },
-    6: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    7: { typ: 'Sa', badge: '37F', sa: true },
-    8: { typ: 'So', badge: '6F', so: true },
-    9: { typ: 'Mo', badge: 'F' },
-    10: { typ: 'Di', badge: 'F' },
-    11: { typ: 'Mi', badge: 'F' },
-    12: { typ: 'Do', badge: 'F' },
-    13: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    14: { typ: 'Sa', badge: '37F', sa: true },
-    15: { typ: 'So', badge: '6F', so: true },
-    16: { typ: 'Mo', badge: 'F' },
-    17: { typ: 'Di', badge: 'F' },
-    18: { typ: 'Mi', badge: 'F' },
-    19: { typ: 'Do', badge: 'F' },
-    20: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    21: { typ: 'Sa', badge: '37F', sa: true },
-    22: { typ: 'So', badge: '6F', so: true },
-    23: { typ: 'Mo', badge: 'AF', note: 'AZV-Tag' },
-    24: { typ: 'Di', badge: '2AF', note: 'Heiligabend' },
-    25: { typ: 'Mi', badge: '12AF', feiertag: true, kommt: '00:00', geht: '08:00', note: '1. Weihnachtstag' },
-    26: { typ: 'Do', badge: 'F', feiertag: false },
-    27: { typ: 'Fr', badge: '4F', urlaub: 4 },
-    28: { typ: 'Sa', badge: '37F', sa: true },
-    29: { typ: 'So', badge: '6F', so: true },
-    30: { typ: 'Mo', badge: 'F' },
-    31: { typ: 'Di', badge: 'F' },
-  }
-};
-
-const entgeltData = {
-  9:  { monat: 'September 2024', zeitraum: '01.09. – 30.09.2024', brutto: 0, abzuege: 0, netto: 0 },
-  10: { monat: 'Oktober 2024',   zeitraum: '01.10. – 31.10.2024', brutto: 0, abzuege: 0, netto: 0 },
-  11: { monat: 'November 2024',  zeitraum: '01.11. – 30.11.2024', brutto: 0, abzuege: 0, netto: 0 },
-  12: { monat: 'Dezember 2024',  zeitraum: '01.12. – 31.12.2024', brutto: 3500, abzuege: 822.81, netto: 2677.19 },
-};
-
-const monthStartDays = { 9: 6, 10: 1, 11: 4, 12: 6 }; // 0=Mo…6=So
-
-let currentTimeMonth = 9;
-let currentEntgeltMonth = 12;
-let manualEntries = [];
-
-// ═══════════════════ INIT ═══════════════════
-function init() {
-  buildMonthTabs();
-  renderDashboard();
-  renderCalendar(currentTimeMonth);
-  renderEntgelt(currentEntgeltMonth);
-  renderAbwesenheit();
-  berechneSteuern();
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(data));
 }
 
-function buildMonthTabs() {
-  const months = [9,10,11,12];
-  const mNames = {9:'Sep',10:'Okt',11:'Nov',12:'Dez'};
-
-  ['time-month-tabs','entgelt-month-tabs'].forEach(id => {
-    const el = document.getElementById(id);
-    el.innerHTML = '';
-    months.forEach(m => {
-      const btn = document.createElement('button');
-      btn.className = 'month-tab has-data' + (
-        id === 'time-month-tabs' ? (m === currentTimeMonth ? ' active' : '') :
-        (m === currentEntgeltMonth ? ' active' : '')
-      );
-      btn.textContent = mNames[m];
-      btn.onclick = () => {
-        if (id === 'time-month-tabs') {
-          currentTimeMonth = m;
-          el.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderCalendar(m);
-        } else {
-          currentEntgeltMonth = m;
-          el.querySelectorAll('.month-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderEntgelt(m);
-        }
-      };
-      el.appendChild(btn);
-    });
-  });
+// ===== THEME =====
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  data.theme = document.body.classList.contains('light') ? 'light' : 'dark';
+  save();
 }
 
-// ═══════════════════ DASHBOARD ═══════════════════
-function renderDashboard() {
-  const yearData = [
-    {m:'Jan',wt:23,u:0,k:0,ft:0},
-    {m:'Feb',wt:21,u:0,k:0,ft:0},
-    {m:'Mär',wt:21,u:0,k:0,ft:1},
-    {m:'Apr',wt:22,u:0,k:0,ft:1},
-    {m:'Mai',wt:21,u:0,k:0,ft:3},
-    {m:'Jun',wt:20,u:0,k:0,ft:1},
-    {m:'Jul',wt:23,u:0,k:0,ft:0},
-    {m:'Aug',wt:22,u:0,k:0,ft:0},
-    {m:'Sep',wt:21,u:0,k:0,ft:0},
-    {m:'Okt',wt:23,u:0,k:0,ft:1},
-    {m:'Nov',wt:21,u:0,k:0,ft:1},
-    {m:'Dez',wt:21,u:0,k:0,ft:2},
-  ];
-  const tbody = document.getElementById('jahres-tbody');
-  tbody.innerHTML = yearData.map((d,i) => `
-    <tr>
-      <td>${d.m}</td>
-      <td class="mono">${d.wt}</td>
-      <td class="text-green">${d.u}</td>
-      <td class="text-red">${d.k}</td>
-      <td class="text-yellow">${d.ft}</td>
-      <td>${i===11 ? '<span class="chip chip-blue">Abgerechnet</span>' : '<span class="chip chip-green">Normal</span>'}</td>
-    </tr>`).join('');
-
-  const etbody = document.getElementById('entgelt-tbody');
-  etbody.innerHTML = [9,10,11,12].map(m => {
-    const d = entgeltData[m];
-    const hasData = d.brutto > 0;
-    return `<tr>
-      <td>${d.monat.replace(' 2024','')}</td>
-      <td class="mono text-right">${hasData ? fmt(d.brutto) : '—'}</td>
-      <td class="mono text-right text-red">${hasData ? fmt(d.abzuege) : '—'}</td>
-      <td class="mono text-right text-green">${hasData ? fmt(d.netto) : '—'}</td>
-    </tr>`;
-  }).join('');
+if (data.theme === 'light') {
+  document.body.classList.add('light');
 }
 
-// ═══════════════════ CALENDAR ═══════════════════
-function renderCalendar(month) {
-  const mInfo = {9:{name:'September',days:30},10:{name:'Oktober',days:31},11:{name:'November',days:30},12:{name:'Dezember',days:31}};
-  const info = mInfo[month];
-  document.getElementById('cal-title').textContent = `📅 ${info.name} 2024`;
-
-  // Build calendar: determine first weekday
-  const firstDay = getFirstWeekday(month);
-  const grid = document.getElementById('calendar-grid');
-  // Remove old day cells
-  while (grid.children.length > 7) grid.removeChild(grid.lastChild);
-
-  // Add empty cells before first
-  for (let i = 0; i < firstDay; i++) {
-    const empty = document.createElement('div');
-    empty.className = 'cal-day empty';
-    grid.appendChild(empty);
-  }
-
-  for (let d = 1; d <= info.days; d++) {
-    const cell = document.createElement('div');
-    const day = dayData[month]?.[d] || {};
-    const wdIdx = ((firstDay + d - 1) % 7);
-    const isWe = wdIdx >= 5;
-    const isUrlaub = day.badge?.includes('U') || day.urlaub > 0;
-    const isKrank = day.badge?.includes('K');
-    const isFeiertag = day.feiertag;
-    const isAzv = day.badge?.includes('A');
-
-    let cls = 'cal-day';
-    if (isWe || day.sa || day.so) cls += ' weekend';
-    if (isFeiertag) cls += ' holiday';
-    if (isUrlaub) cls += ' urlaub';
-    if (isKrank) cls += ' krank';
-    if (isAzv && !isWe) cls += ' urlaub';
-    cell.className = cls;
-
-    let badge = '';
-    if (isFeiertag) badge = '<span class="cal-badge badge-feiertag">FT</span>';
-    else if (isUrlaub) badge = '<span class="cal-badge badge-urlaub">U</span>';
-    else if (isKrank) badge = '<span class="cal-badge badge-krank">K</span>';
-    else if (isAzv) badge = '<span class="cal-badge badge-urlaub">AZV</span>';
-    else if (!isWe) badge = '<span class="cal-badge badge-worked">Arb.</span>';
-    else badge = '<span class="cal-badge badge-weekend">WE</span>';
-
-    const timeStr = day.kommt ? `<div class="cal-time">${day.kommt}–${day.geht}</div>` : '';
-    const noteStr = day.note ? `<div class="cal-time" style="color:var(--text2)">${day.note}</div>` : '';
-
-    cell.innerHTML = `<div class="cal-day-num">${d}</div>${badge}${timeStr}${noteStr}`;
-    grid.appendChild(cell);
-  }
-
-  // Month stats
-  renderMonthStats(month, info.days, firstDay);
-  renderDaysList(month, info.days, firstDay);
-}
-
-function getFirstWeekday(month) {
-  // Based on actual 2024 calendar
-  const fd = {9:6,10:1,11:4,12:6}; // 0=Mo..6=So
-  // Convert: Sep starts Su = index 6
-  // Our grid: Mo=0, Tu=1, We=2, Th=3, Fr=4, Sa=5, Su=6
-  return fd[month];
-}
-
-function renderMonthStats(month, days, firstDay) {
-  const data = dayData[month] || {};
-  let arbeitstage = 0, urlaub = 0, krank = 0, feiertage = 0, wochenende = 0, azv = 0;
-
-  for (let d = 1; d <= days; d++) {
-    const wd = (firstDay + d - 1) % 7;
-    const day = data[d] || {};
-    if (wd >= 5 || day.sa || day.so) { wochenende++; continue; }
-    if (day.feiertag) { feiertage++; continue; }
-    if (day.urlaub > 0 || (day.badge && day.badge.includes('U'))) { urlaub++; continue; }
-    if (day.badge && day.badge.includes('K')) { krank++; continue; }
-    if (day.badge && day.badge.includes('A') && !day.badge.includes('Arb')) { azv++; continue; }
-    arbeitstage++;
-  }
-
-  document.getElementById('month-stats').innerHTML = `
-    <div class="stat-card stat-blue"><div class="stat-label">Arbeitstage</div><div class="stat-value">${arbeitstage}</div></div>
-    <div class="stat-card stat-green"><div class="stat-label">Urlaub</div><div class="stat-value">${urlaub}</div></div>
-    <div class="stat-card stat-red"><div class="stat-label">Krank</div><div class="stat-value">${krank}</div></div>
-    <div class="stat-card stat-yellow"><div class="stat-label">Feiertage</div><div class="stat-value">${feiertage}</div></div>
-    <div class="stat-card"><div class="stat-label">Wochenende</div><div class="stat-value">${wochenende}</div></div>
-    <div class="stat-card stat-orange"><div class="stat-label">AZV/Sonder</div><div class="stat-value">${azv}</div></div>
-  `;
-}
-
-const WD_NAMES = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-
-function renderDaysList(month, days, firstDay) {
-  const data = dayData[month] || {};
-  const tbody = document.getElementById('days-tbody');
-  let rows = '';
-
-  for (let d = 1; d <= days; d++) {
-    const wd = (firstDay + d - 1) % 7;
-    const day = data[d] || {};
-    const wdName = WD_NAMES[wd];
-    const isWe = wd >= 5 || day.sa || day.so;
-    const isUrlaub = day.urlaub > 0 || (day.badge && day.badge.includes('U') && !day.badge.includes('Arb'));
-    const isKrank = day.badge && day.badge.includes('K');
-    const isFeiertag = day.feiertag;
-    const isAzv = day.badge && day.badge.includes('A') && !day.badge.includes('Arb');
-
-    let typ = '', typColor = '';
-    if (isFeiertag) { typ = 'Feiertag'; typColor = 'text-yellow'; }
-    else if (isUrlaub) { typ = 'Urlaub'; typColor = 'text-green'; }
-    else if (isKrank) { typ = 'Krank'; typColor = 'text-red'; }
-    else if (isAzv) { typ = 'AZV-Tag'; typColor = 'text-orange'; }
-    else if (isWe) { typ = 'Wochenende'; typColor = 'text-muted'; }
-    else { typ = 'Arbeitstag'; typColor = 'text-blue'; }
-
-    const kommt = day.kommt || (isWe || isFeiertag ? '—' : '');
-    const geht = day.geht || (isWe || isFeiertag ? '—' : '');
-    const note = day.note || '';
-
-    let netto = '—';
-    if (day.kommt && day.geht && !isWe) {
-      const [kh,km] = day.kommt.split(':').map(Number);
-      const [gh,gm] = day.geht.split(':').map(Number);
-      const mins = (gh*60+gm) - (kh*60+km) - 30;
-      if (mins > 0) netto = (mins/60).toFixed(1)+'h';
-    }
-
-    rows += `<tr>
-      <td class="mono">${d}.</td>
-      <td class="${isWe ? 'text-muted' : ''}">${wdName}</td>
-      <td class="${typColor}">${typ}</td>
-      <td class="mono">${kommt}</td>
-      <td class="mono">${geht}</td>
-      <td class="mono">30 Min</td>
-      <td class="mono ${typColor}">${netto}</td>
-      <td class="text-muted">${note}</td>
-    </tr>`;
-  }
-  tbody.innerHTML = rows;
-}
-
-// ═══════════════════ ENTGELT ═══════════════════
-function renderEntgelt(month) {
-  const d = entgeltData[month];
-  document.getElementById('entgelt-title').textContent = `💰 Entgeltabrechnung ${d.monat}`;
-  document.getElementById('ent-zeitraum').textContent = d.zeitraum;
-
-  const hasData = d.brutto > 0;
-
-  const lohnarten = {
-    basis: [
-      { name: 'Tarifentgelt ETV', val: hasData ? 3500 : 0 },
-      { name: 'Inflationsausgleich', val: 0 },
-      { name: 'Tarifl. Sonderzahlung', val: 0 },
-      { name: 'Tarifl. Urlaubsgeld', val: 0 },
-      { name: 'VWL AG-Anteil', val: 0 },
-      { name: 'DMK-Rente AG-Anteil', val: 0 },
-    ],
-    zeit: [
-      { name: 'Grundentgelt', val: hasData ? d.brutto : 0 },
-      { name: 'Zuschläge', val: 0 },
-      { name: 'Überstunden', val: 0 },
-    ],
-    abzuege: [
-      { name: 'Lohnsteuer', val: hasData ? 239.50 : 0, neg: true },
-      { name: 'Solidaritätszuschlag', val: 0, neg: true },
-      { name: 'Kirchensteuer (9%)', val: hasData ? 21.55 : 0, neg: true },
-      { name: 'Rentenversicherung (9,3%)', val: hasData ? 325.50 : 0, neg: true },
-      { name: 'Krankenversicherung', val: hasData ? 140.88 : 0, neg: true },
-      { name: 'Pflegeversicherung', val: hasData ? 53.38 : 0, neg: true },
-      { name: 'Arbeitslosenversicherung', val: hasData ? 42.00 : 0, neg: true },
-    ],
-    zahlungen: [
-      { name: 'Überweisung', val: hasData ? d.netto : 0 },
-    ]
+// ===== ENTRIES =====
+function addEntry() {
+  const entry = {
+    id: Date.now(),
+    date: date.value,
+    start: start.value,
+    end: end.value,
+    pause: pause.value
   };
 
-  const renderSection = (items) => items.map(i => `
-    <div class="detail-row">
-      <span class="detail-key">${i.name}</span>
-      <span class="mono ${i.neg ? 'text-red' : i.val > 0 ? 'text-blue' : 'text-muted'}">
-        ${i.neg && i.val > 0 ? '−' : ''}${fmt(Math.abs(i.val))}
-      </span>
-    </div>`).join('');
-
-  document.getElementById('entgelt-basis').innerHTML = renderSection(lohnarten.basis);
-  document.getElementById('entgelt-zeit').innerHTML = renderSection(lohnarten.zeit);
-  document.getElementById('entgelt-abzuege').innerHTML = renderSection(lohnarten.abzuege);
-  document.getElementById('entgelt-zahlungen').innerHTML = renderSection(lohnarten.zahlungen);
+  data.entries.push(entry);
+  save();
+  render();
 }
 
-// ═══════════════════ ABWESENHEIT ═══════════════════
-function renderAbwesenheit() {
-  const months = {9:'September',10:'Oktober',11:'November',12:'Dezember'};
-  const tbody = document.getElementById('abwesenheit-tbody');
-  tbody.innerHTML = Object.entries(months).map(([m, name]) => {
-    const data = dayData[parseInt(m)] || {};
-    let u=0, k=0, ft=0, azv=0, su=0;
-    Object.values(data).forEach(d => {
-      if (d.urlaub) u += 1;
-      if (d.feiertag) ft += 1;
-      if (d.badge?.includes('K')) k += 1;
-      if (d.badge?.includes('A') && !d.badge?.includes('Arb')) azv += 1;
-    });
-    return `<tr>
-      <td>${name}</td>
-      <td class="${u ? 'text-green' : 'text-muted'}">${u}</td>
-      <td class="${k ? 'text-red' : 'text-muted'}">${k}</td>
-      <td class="${ft ? 'text-yellow' : 'text-muted'}">${ft}</td>
-      <td class="${azv ? 'text-orange' : 'text-muted'}">${azv}</td>
-      <td class="text-muted">${su}</td>
-    </tr>`;
-  }).join('');
+function removeEntry(id) {
+  data.entries = data.entries.filter(e => e.id !== id);
+  save();
+  render();
 }
 
-function addAbwesenheit() {
-  alert('Abwesenheit wurde gespeichert (Demo-Modus).');
-}
-function clearAbwesenheit() {
-  document.getElementById('ab-tag').value = 1;
-}
-
-// ═══════════════════ STEUER ═══════════════════
-function berechneSteuern() {
-  const brutto = parseFloat(document.getElementById('steuer-lohn').value) || 0;
-  const stkl = parseInt(document.getElementById('steuer-klasse').value);
-  const kirche = parseInt(document.getElementById('steuer-kirche').value);
-  const kvSatz = parseFloat(document.getElementById('steuer-kv').value) / 100;
-
-  // Simplified German payroll tax calculation
-  // RV: 9.3%, KV: 4.025% + Zusatz 0.85%, PV: 1.525%, AV: 1.2%
-  const rv = brutto * 0.093;
-  const kv = brutto * 0.04025;
-  const pv = brutto * 0.01525;
-  const av = brutto * 0.012;
-
-  // Income tax (simplified progressive)
-  let lst = 0;
-  let svGesamt = rv + kv + pv + av;
-
-  // Very simplified tax calculation
-  // Annual gross
-  const annual = brutto * 12;
-  const aNetto = annual - svGesamt * 12;
-
-  // Apply basic allowances by Steuerklasse
-  const grundfreibetrag = stkl === 3 ? 24846 : 11604;
-  const zvE = Math.max(0, aNetto - grundfreibetrag - 1000); // 1000 = Arbeitnehmer-Pauschbetrag
-
-  let annualLST = 0;
-  if (zvE <= 0) annualLST = 0;
-  else if (zvE <= 17005) annualLST = 0.14 * zvE;
-  else if (zvE <= 66760) annualLST = (0.228 + 0.0000020934 * (zvE - 17005)) * zvE - 169.3;
-  else if (zvE <= 277825) annualLST = 0.42 * zvE - 9867;
-  else annualLST = 0.45 * zvE - 18187;
-
-  lst = Math.max(0, annualLST / 12);
-  const solz = lst > 1370 ? lst * 0.055 : 0;
-  const kist = kirche > 0 ? lst * (kirche / 100) : 0;
-
-  const gesamt = lst + solz + kist + rv + kv + pv + av;
-  const netto = brutto - gesamt;
-
-  document.getElementById('res-brutto').textContent = fmt(brutto);
-  document.getElementById('res-lst').textContent = fmt(lst);
-  document.getElementById('res-solz').textContent = fmt(solz);
-  document.getElementById('res-kist').textContent = fmt(kist);
-  document.getElementById('res-rv').textContent = fmt(rv);
-  document.getElementById('res-kv').textContent = fmt(kv);
-  document.getElementById('res-pv').textContent = fmt(pv);
-  document.getElementById('res-av').textContent = fmt(av);
-  document.getElementById('res-gesamt').textContent = fmt(gesamt);
-  document.getElementById('res-netto').textContent = fmt(netto);
-
-  // Progress bars
-  const netPct = (netto/brutto*100).toFixed(1);
-  const stPct = ((lst+solz+kist)/brutto*100).toFixed(1);
-  const svPct = ((rv+kv+pv+av)/brutto*100).toFixed(1);
-  document.getElementById('pct-netto').textContent = netPct + '%';
-  document.getElementById('pct-steuern').textContent = stPct + '%';
-  document.getElementById('pct-sv').textContent = svPct + '%';
-  document.getElementById('bar-netto').style.width = netPct + '%';
-  document.getElementById('bar-steuern').style.width = stPct + '%';
-  document.getElementById('bar-sv').style.width = svPct + '%';
-
-  // AG-Beiträge
-  const agRv = brutto * 0.093;
-  const agKv = brutto * 0.0765;
-  const agPv = brutto * 0.01525;
-  const agAv = brutto * 0.012;
-  const agGes = agRv + agKv + agPv + agAv;
-  document.getElementById('ag-rv').textContent = fmt(agRv);
-  document.getElementById('ag-kv').textContent = fmt(agKv);
-  document.getElementById('ag-pv').textContent = fmt(agPv);
-  document.getElementById('ag-av').textContent = fmt(agAv);
-  document.getElementById('ag-gesamt').textContent = fmt(agGes);
-  document.getElementById('ag-total').textContent = fmt(brutto + agGes);
+function calc(e) {
+  if (!e.start || !e.end) return '-';
+  const s = e.start.split(':');
+  const en = e.end.split(':');
+  let mins = (en[0]*60+ +en[1]) - (s[0]*60+ +s[1]) - (e.pause||0);
+  return (mins/60).toFixed(2)+'h';
 }
 
-// ═══════════════════ TIME ENTRY ═══════════════════
-function addTimeEntry() {
-  const m = parseInt(document.getElementById('et-monat').value);
-  const d = parseInt(document.getElementById('et-tag').value);
-  const kommt = document.getElementById('et-kommt').value;
-  const geht = document.getElementById('et-geht').value;
-  const pause = parseInt(document.getElementById('et-pause').value) || 0;
-  const typ = document.getElementById('et-typ').value;
-  const kst = document.getElementById('et-kst').value;
-
-  const mNames = {9:'September',10:'Oktober',11:'November',12:'Dezember'};
-  const wdIdx = (monthStartDays[m] + d - 1) % 7;
-  const wd = WD_NAMES[wdIdx];
-
-  let netto = '—';
-  if (kommt && geht) {
-    const [kh,km] = kommt.split(':').map(Number);
-    const [gh,gm] = geht.split(':').map(Number);
-    const mins = (gh*60+gm) - (kh*60+km) - pause;
-    netto = (mins/60).toFixed(2) + 'h';
-  }
-
-  const entry = { m, d, mName: mNames[m], wd, typ, kommt, geht, pause, netto, kst };
-  manualEntries.push(entry);
-  renderManualEntries();
-
-  const fb = document.getElementById('et-feedback');
-  fb.style.display = 'block';
-  fb.textContent = `✅ ${mNames[m]} ${d}. – ${wd} eingetragen.`;
-  setTimeout(() => fb.style.display = 'none', 3000);
+function render() {
+  list.innerHTML = data.entries.map(e => `
+    <div style="background:var(--surface);margin:5px;padding:10px;border-radius:6px">
+      ${e.date} | ${e.start}-${e.end} | ${calc(e)}
+      <button onclick="removeEntry(${e.id})">❌</button>
+    </div>
+  `).join('');
 }
 
-function renderManualEntries() {
-  const tbody = document.getElementById('manual-tbody');
-  if (!manualEntries.length) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-muted" style="text-align:center;padding:20px">Noch keine manuellen Einträge</td></tr>';
-    return;
-  }
-  tbody.innerHTML = manualEntries.map((e, i) => `
-    <tr>
-      <td>${e.mName}</td>
-      <td class="mono">${e.d}.</td>
-      <td>${e.wd}</td>
-      <td class="text-blue">${e.typ}</td>
-      <td class="mono">${e.kommt}</td>
-      <td class="mono">${e.geht}</td>
-      <td class="mono">${e.pause} Min</td>
-      <td class="mono text-green">${e.netto}</td>
-      <td class="text-muted mono">${e.kst || '—'}</td>
-      <td><button class="btn btn-secondary" style="padding:3px 10px;font-size:11px" onclick="removeEntry(${i})">Löschen</button></td>
-    </tr>`).join('');
-}
+render();
 
-function removeEntry(i) {
-  manualEntries.splice(i, 1);
-  renderManualEntries();
-}
+// ===== INSTALL BUTTON =====
+let deferredPrompt;
 
-function clearTimeForm() {
-  document.getElementById('et-tag').value = 1;
-  document.getElementById('et-kommt').value = '07:00';
-  document.getElementById('et-geht').value = '15:30';
-  document.getElementById('et-pause').value = 30;
-  document.getElementById('et-kst').value = '';
-}
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  install-btn.style.display = 'inline';
+});
 
-// ═══════════════════ NAV ═══════════════════
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('visible');
-  document.querySelector(`[onclick="showSection('${id}')"]`).classList.add('active');
-}
+install-btn.onclick = async () => {
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  install-btn.style.display = 'none';
+};
 
-// ═══════════════════ UTILS ═══════════════════
-function fmt(n) {
-  return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
 }
-
-// ═══════════════════ START ═══════════════════
-init();
 </script>
 
 </body>
